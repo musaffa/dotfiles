@@ -13,8 +13,18 @@ set nocompatible
 " Make backspace behave in a sane manner.
 set backspace=indent,eol,start
 
+" Plugin manager
+call plug#begin('~/.vim/plugged')
+
+Plug 'altercation/vim-colors-solarized'
+
+call plug#end()
+
+
 " Switch syntax highlighting on
 syntax on
+set background=dark
+colorscheme solarized
 
 " Enable file type detection and do language-dependent indenting.
 filetype plugin indent on
