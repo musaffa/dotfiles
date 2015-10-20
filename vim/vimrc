@@ -1,30 +1,72 @@
-" To use it, copy it to
-"     for Unix and OS/2:  ~/.vimrc
-"  for MS-DOS and Win32:  $VIM\_vimrc
-"
-"  If you don't understand a setting in here, just type ':h setting'.
-
-
+" If you don't understand a setting in here, just type ':h setting'.
 
 " Use Vim settings, rather than Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
-" Make backspace behave in a sane manner.
-set backspace=indent,eol,start
+" Set Clipboard
+set clipboard=unnamedplus
+
+" Set Leader key
+let mapleader = ","
 
 " Plugin manager
 call plug#begin('~/.vim/plugged')
 
+Plug 'tpope/vim-sensible'
 Plug 'altercation/vim-colors-solarized'
+Plug 'tmux-plugins/vim-tmux'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'tpope/vim-fugitive'
+Plug 'kien/ctrlp.vim'
+Plug 'justinmk/vim-gtfo'
+Plug 'bling/vim-airline'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary' 
+Plug 'tpope/vim-unimpaired'
+Plug 'scrooloose/syntastic'
+Plug 'honza/vim-snippets'
+Plug 'tpope/vim-rails'
+Plug 'thoughtbot/vim-rspec'
 
 call plug#end()
 
 
 " Switch syntax highlighting on
-syntax on
+let g:solarized_termcolors=16
 set background=dark
 colorscheme solarized
 
-" Enable file type detection and do language-dependent indenting.
-filetype plugin indent on
+" Toggle relative numbering, and set to absolute on loss of focus or insert mode
+set rnu
+function! ToggleNumbersOn()
+    set nu!
+    set rnu
+endfunction
+function! ToggleRelativeOn()
+    set rnu!
+    set nu
+endfunction
+autocmd FocusLost * call ToggleRelativeOn()
+autocmd FocusGained * call ToggleRelativeOn()
+autocmd InsertEnter * call ToggleRelativeOn()
+autocmd InsertLeave * call ToggleRelativeOn()
+
+" Allow powerline symbols to show up
+let g:airline_powerline_fonts = 1
+
+" TAB settings
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+
+" Open split window
+set splitright
+set splitbelow
+
+" RSpec.vim mappings
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>s :call RunNearestSpec()<CR>
+map <Leader>l :call RunLastSpec()<CR>
+map <Leader>a :call RunAllSpecs()<CR>
