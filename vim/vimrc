@@ -17,17 +17,26 @@ Plug 'tpope/vim-sensible'
 Plug 'altercation/vim-colors-solarized'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'bling/vim-airline'
+
 Plug 'tpope/vim-fugitive'
 Plug 'kien/ctrlp.vim'
 Plug 'justinmk/vim-gtfo'
-Plug 'bling/vim-airline'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary' 
+Plug 'janko-m/vim-test'
 Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/syntastic'
+
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-commentary' 
+Plug 'tpope/vim-surround'
+
 Plug 'tpope/vim-rails'
-Plug 'thoughtbot/vim-rspec'
+Plug 'heartsentwined/vim-emblem'
 
 call plug#end()
 
@@ -65,8 +74,21 @@ set expandtab
 set splitright
 set splitbelow
 
-" RSpec.vim mappings
-map <Leader>t :call RunCurrentSpecFile()<CR>
-map <Leader>s :call RunNearestSpec()<CR>
-map <Leader>l :call RunLastSpec()<CR>
-map <Leader>a :call RunAllSpecs()<CR>
+" Refresh after any change in file
+set autoread
+
+" set linebreak
+set linebreak
+
+" vim test mappings
+nmap <silent> <leader>t :TestNearest<CR>
+nmap <silent> <leader>T :TestFile<CR>
+nmap <silent> <leader>a :TestSuite<CR>
+nmap <silent> <leader>l :TestLast<CR>
+nmap <silent> <leader>g :TestVisit<CR>
+
+" set igonres
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.idea/*,*/tmp/*
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  'node_modules$\|bower_components$\|dist$',
+  \ }
