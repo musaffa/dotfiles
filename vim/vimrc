@@ -18,6 +18,7 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'bling/vim-airline'
+Plug 'mhinz/vim-startify'
 
 Plug 'tpope/vim-vinegar'
 Plug 'kien/ctrlp.vim'
@@ -25,6 +26,7 @@ Plug 'rking/ag.vim'
 Plug 'justinmk/vim-gtfo'
 
 Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-eunuch'
 
 Plug 'MarcWeber/vim-addon-mw-utils'
