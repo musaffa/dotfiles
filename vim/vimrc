@@ -19,14 +19,13 @@ Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'bling/vim-airline'
 
-Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-vinegar'
 Plug 'kien/ctrlp.vim'
 Plug 'rking/ag.vim'
 Plug 'justinmk/vim-gtfo'
-Plug 'janko-m/vim-test'
-Plug 'tpope/vim-unimpaired'
+
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-eunuch'
-Plug 'scrooloose/syntastic'
 
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
@@ -35,6 +34,10 @@ Plug 'honza/vim-snippets'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary' 
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+
+Plug 'janko-m/vim-test'
+Plug 'scrooloose/syntastic'
 
 Plug 'tpope/vim-rails'
 Plug 'heartsentwined/vim-emblem'
@@ -80,6 +83,11 @@ set autoread
 
 " set linebreak
 set linebreak
+
+" explorer settings
+let g:netrw_preview = 1
+let g:netrw_alto = 0
+let g:netrw_winsize = 25
 
 " vim test mappings
 nmap <silent> <leader>t :TestNearest<CR>
