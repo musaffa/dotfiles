@@ -26,8 +26,9 @@ Plug 'tpope/vim-repeat'
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
-Plug 'kien/ctrlp.vim'
-Plug 'rking/ag.vim'
+
+Plug 'Shougo/unite.vim'
+Plug 'Shougo/neoyank.vim'
 
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
@@ -101,8 +102,24 @@ nmap <silent> <leader>a :TestSuite<CR>
 nmap <silent> <leader>l :TestLast<CR>
 nmap <silent> <leader>g :TestVisit<CR>
 
-" set igonres
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.idea/*,*/tmp/*
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  'node_modules$\|bower_components$\|dist$',
-  \ }
+
+" Unite settings
+
+" Unite sources
+call unite#custom#source('file_rec/async,buffer', 'matchers', ['converter_relative_word', 'matcher_fuzzy'])
+call unite#custom#source('file_rec/async,buffer', 'sorters', 'sorter_rank')
+
+" Config Ag and use it instead of find
+let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
+
+
+" Configure Ag and use it instead of grep
+let g:unite_source_grep_command = 'ag'
+let g:unite_source_grep_default_opts = '--follow --nocolor --nogroup --smart-case --hidden'
+let g:unite_source_grep_recursive_opt = ''
+
+" Unite keymaps
+nnoremap <leader>f :<C-u>Unite -no-split -buffer-name=files   -start-insert -ignorecase file_rec/async:!<cr>
+nnoremap <leader>b :<C-u>Unite -no-split -buffer-name=buffer  -start-insert -ignorecase buffer<cr>
+nnoremap <leader>s :<C-u>Unite -no-split -buffer-name=grep    grep<cr>
+nnoremap <leader>y :<C-u>Unite -no-split -buffer-name=yank    history/yank<cr>
