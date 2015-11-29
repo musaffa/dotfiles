@@ -1,10 +1,28 @@
 " If you don't understand a setting in here, just type ':h setting'.
 
+" Editor settings
+set linebreak
+set ignorecase
+set smartcase
+
 " Set Clipboard
 set clipboard=unnamedplus
 
+" TAB settings
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+
+" Window settings
+set splitright
+set splitbelow
+
 " Set Leader key
 let mapleader = ","
+
+" Map the missing Y yank
+nnoremap Y y$
 
 " Plugin manager
 call plug#begin('~/.vim/plugged')
@@ -69,25 +87,12 @@ autocmd InsertLeave * call ToggleRelativeOn()
 " Allow powerline symbols to show up
 let g:airline_powerline_fonts = 1
 
-" TAB settings
-set tabstop=2
-set shiftwidth=2
-set softtabstop=2
-set expandtab
-
-" Open split window
-set splitright
-set splitbelow
-
-" set linebreak
-set linebreak
-
-" explorer settings
+" Explorer settings
 let g:netrw_preview = 1
 let g:netrw_alto = 0
 let g:netrw_winsize = 25
 
-" vim test mappings
+" Vim test mappings
 nmap <silent> <leader>t :TestNearest<CR>
 nmap <silent> <leader>T :TestFile<CR>
 nmap <silent> <leader>a :TestSuite<CR>
