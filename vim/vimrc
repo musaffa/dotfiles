@@ -1,9 +1,5 @@
 " If you don't understand a setting in here, just type ':h setting'.
 
-" Use Vim settings, rather than Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
-set nocompatible
-
 " Set Clipboard
 set clipboard=unnamedplus
 
@@ -20,7 +16,6 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'bling/vim-airline'
 Plug 'mhinz/vim-startify'
 
-Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 
@@ -43,7 +38,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 
 Plug 'janko-m/vim-test'
-Plug 'scrooloose/syntastic'
+Plug 'benekastah/neomake'
 
 Plug 'tpope/vim-rails'
 Plug 'heartsentwined/vim-emblem'
@@ -83,9 +78,6 @@ set expandtab
 " Open split window
 set splitright
 set splitbelow
-
-" Refresh after any change in file
-set autoread
 
 " set linebreak
 set linebreak

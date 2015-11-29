@@ -5,6 +5,7 @@ set -o noclobber
 stty -ixon
 
 # Default editor
+alias vim='nvim'
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
