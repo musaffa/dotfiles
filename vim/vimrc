@@ -4,6 +4,8 @@
 set linebreak
 set ignorecase
 set smartcase
+set number
+set relativenumber
 
 " Set Clipboard
 set clipboard=unnamedplus
@@ -51,12 +53,13 @@ Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
 Plug 'jiangmiao/auto-pairs'
-Plug 'tpope/vim-commentary' 
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 
 Plug 'janko-m/vim-test'
 Plug 'benekastah/neomake'
+Plug 'editorconfig/editorconfig-vim'
 
 Plug 'tpope/vim-rails'
 Plug 'heartsentwined/vim-emblem'
@@ -64,25 +67,13 @@ Plug 'heartsentwined/vim-emblem'
 call plug#end()
 
 
-" Switch syntax highlighting on
+" Theme
 let g:solarized_termcolors=16
 set background=dark
 colorscheme solarized
 
-" Toggle relative numbering, and set to absolute on loss of focus or insert mode
-set rnu
-function! ToggleNumbersOn()
-    set nu!
-    set rnu
-endfunction
-function! ToggleRelativeOn()
-    set rnu!
-    set nu
-endfunction
-autocmd FocusLost * call ToggleRelativeOn()
-autocmd FocusGained * call ToggleRelativeOn()
-autocmd InsertEnter * call ToggleRelativeOn()
-autocmd InsertLeave * call ToggleRelativeOn()
+" EditorConfig settings
+let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 
 " Allow powerline symbols to show up
 let g:airline_powerline_fonts = 1
