@@ -62,6 +62,8 @@ Plug 'benekastah/neomake'
 Plug 'editorconfig/editorconfig-vim'
 
 Plug 'tpope/vim-rails'
+Plug 'tpope/vim-bundler'
+
 Plug 'heartsentwined/vim-emblem'
 
 call plug#end()
