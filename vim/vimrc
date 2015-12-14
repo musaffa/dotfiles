@@ -120,3 +120,15 @@ tnoremap <C-h> <C-\><C-n><C-w>h
 tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
 tnoremap <C-l> <C-\><C-n><C-w>l
+
+
+" Neomake settings
+
+" Run neomake on buffer write
+autocmd! BufWritePost * Neomake
+
+" Preserve the cursor position when loclist or quickfix window is opened
+let g:neomake_open_list = 2
+
+" Makers
+let g:neomake_javascript_enabled_makers = ['jshint']
