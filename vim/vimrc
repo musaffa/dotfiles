@@ -23,6 +23,10 @@ set splitbelow
 " Set Leader key
 let mapleader = ","
 
+" Backup settings
+set backupdir=~/.local/share/nvim/backup
+set nowritebackup
+
 " Map the missing Y yank
 nnoremap Y y$
 
