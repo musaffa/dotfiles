@@ -64,7 +64,7 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
 
-Plug 'heartsentwined/vim-emblem'
+Plug 'andorov/vim-emblem'
 
 call plug#end()
 
