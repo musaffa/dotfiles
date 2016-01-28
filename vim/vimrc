@@ -37,7 +37,7 @@ Plug 'tpope/vim-sensible'
 Plug 'altercation/vim-colors-solarized'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline'
 Plug 'edkolev/tmuxline.vim'
 Plug 'mhinz/vim-startify'
 
