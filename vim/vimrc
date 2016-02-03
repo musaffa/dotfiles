@@ -72,6 +72,8 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
 
+Plug 'moll/vim-node'
+
 Plug 'andorov/vim-emblem'
 
 call plug#end()
