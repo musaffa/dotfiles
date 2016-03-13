@@ -67,6 +67,7 @@ Plug 'tpope/vim-unimpaired'
 Plug 'terryma/vim-multiple-cursors'
 
 Plug 'janko-m/vim-test'
+Plug 'benmills/vimux'
 Plug 'benekastah/neomake'
 Plug 'editorconfig/editorconfig-vim'
 
@@ -145,3 +146,7 @@ let g:neomake_open_list = 2
 
 " Makers
 let g:neomake_javascript_enabled_makers = ['jshint']
+
+" make test commands execute using vimux
+let test#strategy = 'vimux'
+let g:VimuxHeight = "30"
