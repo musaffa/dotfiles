@@ -13,6 +13,9 @@ export EDITOR="$VISUAL"
 alias mux='TERM=screen-256color-bce mux'
 alias tmux='TERM=screen-256color-bce tmux'
 
+# Httpie
+alias http='http --style solarized'
+
 export PATH="$HOME/.linuxbrew/bin:$PATH"
 
 # Version managers
