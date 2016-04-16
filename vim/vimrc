@@ -6,6 +6,7 @@ set ignorecase
 set smartcase
 set number
 set relativenumber
+set colorcolumn=81
 
 " Set Clipboard
 set clipboard=unnamedplus
@@ -45,6 +46,7 @@ Plug 'mhinz/vim-startify'
 
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-dispatch'
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
@@ -73,10 +75,12 @@ Plug 'editorconfig/editorconfig-vim'
 
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-endwise'
 
 Plug 'moll/vim-node'
-
 Plug 'andorov/vim-emblem'
+
+Plug 'rust-lang/rust.vim'
 
 call plug#end()
 
