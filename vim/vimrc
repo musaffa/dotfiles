@@ -79,6 +79,7 @@ Plug 'tpope/vim-endwise'
 
 Plug 'moll/vim-node'
 Plug 'andorov/vim-emblem'
+Plug 'joukevandermaas/vim-ember-hbs'
 
 Plug 'rust-lang/rust.vim'
 
