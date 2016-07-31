@@ -47,6 +47,7 @@ Plug 'mhinz/vim-startify'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-dispatch'
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
