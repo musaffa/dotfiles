@@ -9,24 +9,5 @@ alias vim='nvim'
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
-# Tmux
-alias mux='TERM=screen-256color-bce mux'
-alias tmux='TERM=screen-256color-bce tmux'
-
 # Httpie
 alias http='http --style solarized'
-
-export PATH="$HOME/.linuxbrew/bin:$PATH"
-
-# Version managers
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-
-[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
-
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
