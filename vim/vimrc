@@ -36,13 +36,15 @@ nnoremap Y y$
 call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-sensible'
-Plug 'lifepillar/vim-solarized8'
+
 Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
+
+Plug 'mhinz/vim-startify'
+Plug 'lifepillar/vim-solarized8'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'edkolev/tmuxline.vim'
-Plug 'mhinz/vim-startify'
 
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
@@ -50,6 +52,7 @@ Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
+Plug 'ashisha/image.vim'
 
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neoyank.vim'
