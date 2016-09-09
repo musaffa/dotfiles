@@ -52,7 +52,6 @@ Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
-Plug 'ashisha/image.vim'
 
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neoyank.vim'
