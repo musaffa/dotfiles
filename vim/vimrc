@@ -36,11 +36,12 @@ nnoremap Y y$
 call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-sensible'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'mhinz/vim-startify'
 
 Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
 
-Plug 'mhinz/vim-startify'
 Plug 'lifepillar/vim-solarized8'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -75,16 +76,16 @@ Plug 'tpope/vim-abolish'
 Plug 'janko-m/vim-test'
 Plug 'benmills/vimux'
 Plug 'benekastah/neomake'
-Plug 'editorconfig/editorconfig-vim'
 
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-endwise'
 
 Plug 'moll/vim-node'
-Plug 'andorov/vim-emblem'
+Plug 'yalesov/vim-emblem'
 Plug 'joukevandermaas/vim-ember-hbs'
 
+Plug 'pangloss/vim-javascript'
 Plug 'rust-lang/rust.vim'
 
 call plug#end()
