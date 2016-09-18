@@ -49,7 +49,7 @@ Plug 'edkolev/tmuxline.vim'
 
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
-Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
@@ -64,6 +64,7 @@ Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
@@ -158,3 +159,19 @@ let g:neomake_javascript_enabled_makers = ['eslint']
 " make test commands execute using vimux
 let test#strategy = 'vimux'
 let g:VimuxHeight = "30"
+
+" Deoplete settings
+let g:deoplete#enable_at_startup = 1
+" let g:deoplete#disable_auto_complete = 1
+
+" Setting tab to cycle the autocomplete options
+inoremap <silent><expr> <TAB> pumvisible() ? "\<C-n>" :
+\ <SID>check_back_space() ? "\<TAB>" : deoplete#mappings#manual_complete()
+
+function! s:check_back_space() abort "{{{
+let col = col('.') - 1
+return !col || getline('.')[col - 1]  =~ '\s'
+endfunction"}}}
+
+" Don't autocomplete with parenthesis
+call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
