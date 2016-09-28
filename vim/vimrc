@@ -50,6 +50,7 @@ Plug 'edkolev/tmuxline.vim'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
+Plug 'metakirby5/codi.vim'
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
