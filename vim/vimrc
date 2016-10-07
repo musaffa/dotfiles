@@ -49,14 +49,12 @@ Plug 'edkolev/tmuxline.vim'
 
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
-Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
 Plug 'metakirby5/codi.vim'
 
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
 
-Plug 'Shougo/unite.vim'
-Plug 'Shougo/neoyank.vim'
+Plug 'Shougo/denite.nvim'
 
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
@@ -116,25 +114,17 @@ nmap <silent> <leader>l :TestLast<CR>
 nmap <silent> <leader>g :TestVisit<CR>
 
 
-" Unite settings
+" Denite settings
+call denite#custom#var('file_rec', 'command',
+\ ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', ''])
 
-" Config Ag and use it instead of find
-let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
+call denite#custom#var('grep', 'command', ['ag'])
+call denite#custom#var('grep', 'recursive_opts', [])
+call denite#custom#var('grep', 'default_opts',
+\ ['--follow', '--nocolor', '--nogroup', '--smart-case'])
 
-" Configure Ag and use it instead of grep
-let g:unite_source_grep_command = 'ag'
-let g:unite_source_grep_default_opts = '--follow --nocolor --nogroup --smart-case --hidden'
-let g:unite_source_grep_recursive_opt = ''
-
-" Unite sources
-call unite#custom#source('file_rec/neovim,buffer', 'matchers', ['converter_relative_word', 'matcher_fuzzy'])
-call unite#custom#source('file_rec/neovim,buffer', 'sorters', 'sorter_rank')
-
-" Unite keymaps
-nnoremap <leader>f :<C-u>Unite -no-split -buffer-name=files   -start-insert -ignorecase file_rec/neovim:!<cr>
-nnoremap <leader>b :<C-u>Unite -no-split -buffer-name=buffer  -start-insert -ignorecase buffer<cr>
-nnoremap <leader>s :<C-u>Unite -no-split -buffer-name=grep    grep<cr>
-nnoremap <leader>y :<C-u>Unite -no-split -buffer-name=yank    history/yank<cr>
+nnoremap <leader>f :<C-u>Denite file_rec<cr>
+nnoremap <leader>s :<C-u>Denite grep<cr>
 
 " Neovim terminal mappings
 if has('nvim')
