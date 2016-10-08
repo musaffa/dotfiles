@@ -74,7 +74,7 @@ Plug 'terryma/vim-multiple-cursors'
 Plug 'tpope/vim-abolish'
 
 Plug 'janko-m/vim-test'
-Plug 'benmills/vimux'
+Plug 'kassio/neoterm'
 Plug 'benekastah/neomake'
 
 Plug 'tpope/vim-rails'
@@ -147,9 +147,8 @@ let g:neomake_open_list = 2
 " Makers
 let g:neomake_javascript_enabled_makers = ['eslint']
 
-" make test commands execute using vimux
-let test#strategy = 'vimux'
-let g:VimuxHeight = "30"
+" make test commands execute using neoterm
+let test#strategy = 'neoterm'
 
 " Deoplete settings
 let g:deoplete#enable_at_startup = 1
