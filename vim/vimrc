@@ -35,7 +35,6 @@ nnoremap Y y$
 " Plugin manager
 call plug#begin('~/.vim/plugged')
 
-Plug 'tpope/vim-sensible'
 Plug 'editorconfig/editorconfig-vim'
 
 Plug 'tmux-plugins/vim-tmux'
