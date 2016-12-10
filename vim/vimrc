@@ -85,6 +85,7 @@ Plug 'joukevandermaas/vim-ember-hbs'
 
 Plug 'pangloss/vim-javascript'
 Plug 'rust-lang/rust.vim'
+Plug 'hynek/vim-python-pep8-indent'
 
 call plug#end()
 
@@ -113,6 +114,11 @@ nmap <silent> <leader>g :TestVisit<CR>
 
 
 " Denite settings
+" Denite custom highlights
+highlight default link deniteMatchedChar CursorLine
+highlight default link deniteMatched None
+
+" Denite custom commands
 call denite#custom#var('file_rec', 'command',
 \ ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', ''])
 
@@ -120,6 +126,10 @@ call denite#custom#var('grep', 'command', ['ag'])
 call denite#custom#var('grep', 'recursive_opts', [])
 call denite#custom#var('grep', 'default_opts',
 \ ['--follow', '--nocolor', '--nogroup', '--smart-case', '--hidden'])
+
+" Denite custom mappings
+call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
+call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
 
 nnoremap <leader>f :<C-u>Denite file_rec<cr>
 nnoremap <leader>s :<C-u>Denite grep<cr>
@@ -164,3 +174,6 @@ endfunction"}}}
 
 " Don't autocomplete with parenthesis
 call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
+
+" Prettify Json files
+nnoremap <Leader>fj :%!jq '.'<CR>
