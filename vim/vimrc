@@ -114,8 +114,8 @@ nmap <silent> <leader>g :TestVisit<CR>
 
 " Denite settings
 " Denite custom highlights
-highlight default link deniteMatchedChar CursorLine
-highlight default link deniteMatchedRange None
+call denite#custom#option('_', 'highlight_matched_range', 'None')
+call denite#custom#option('_', 'highlight_matched_char', 'CursorLine')
 
 " Denite custom commands
 call denite#custom#var('file_rec', 'command',
