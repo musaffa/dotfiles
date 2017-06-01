@@ -81,6 +81,7 @@ Plug 'tpope/vim-endwise'
 Plug 'moll/vim-node'
 Plug 'yalesov/vim-emblem'
 Plug 'joukevandermaas/vim-ember-hbs'
+Plug 'jparise/vim-graphql'
 
 Plug 'pangloss/vim-javascript'
 Plug 'rust-lang/rust.vim'
