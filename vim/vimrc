@@ -29,6 +29,9 @@ set backupdir=~/.local/share/nvim/backup
 set directory=~/.local/share/nvim/swap
 set nowritebackup
 
+" Vim diff split
+set diffopt+=vertical
+
 " Map the missing Y yank
 nnoremap Y y$
 
