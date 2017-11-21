@@ -74,7 +74,7 @@ Plug 'terryma/vim-multiple-cursors'
 Plug 'tpope/vim-abolish'
 
 Plug 'janko-m/vim-test'
-Plug 'kassio/neoterm'
+Plug 'benmills/vimux'
 Plug 'benekastah/neomake'
 
 Plug 'tpope/vim-rails'
@@ -164,8 +164,7 @@ let g:neomake_open_list = 2
 let g:neomake_javascript_enabled_makers = ['eslint']
 
 " make test commands execute using vimux
-let test#strategy = 'neoterm'
-let g:neoterm_size = 15
+let test#strategy = 'vimux'
 
 " Deoplete Seetings
 let g:deoplete#enable_at_startup = 1
@@ -176,6 +175,14 @@ call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
 
 " deoplete tab-complete
 inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+
+" Make sure deoplete is not called when editing with multiple cursors
+function Multiple_cursors_before()
+  let g:deoplete#disable_auto_complete = 1
+endfunction
+function Multiple_cursors_after()
+  let g:deoplete#disable_auto_complete = 0
+endfunction
 
 
 " Prettify Json files
