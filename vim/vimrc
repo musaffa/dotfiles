@@ -97,7 +97,9 @@ call plug#end()
 
 " Theme
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-colorscheme solarized8_dark
+let g:solarized_use16 = 1
+set background=dark
+colorscheme solarized8
 
 " EditorConfig settings
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
