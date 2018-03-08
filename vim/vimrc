@@ -180,10 +180,10 @@ call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
 inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " Make sure deoplete is not called when editing with multiple cursors
-function Multiple_cursors_before()
+function! Multiple_cursors_before()
   let g:deoplete#disable_auto_complete = 1
 endfunction
-function Multiple_cursors_after()
+function! Multiple_cursors_after()
   let g:deoplete#disable_auto_complete = 0
 endfunction
 
