@@ -86,6 +86,7 @@ Plug 'slim-template/vim-slim'
 Plug 'moll/vim-node'
 Plug 'yalesov/vim-emblem'
 Plug 'joukevandermaas/vim-ember-hbs'
+Plug 'slim-template/vim-slim'
 Plug 'jparise/vim-graphql'
 
 Plug 'pangloss/vim-javascript'
@@ -189,3 +190,6 @@ endfunction
 
 " Prettify Json files
 nnoremap <Leader>fj :%!jq '.'<CR>
+
+" Use slim syntax highlighting for inky files
+autocmd BufNewFile,BufRead *.inky set syntax=slim
