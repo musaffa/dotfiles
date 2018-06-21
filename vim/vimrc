@@ -92,6 +92,7 @@ Plug 'jparise/vim-graphql'
 Plug 'pangloss/vim-javascript'
 Plug 'rust-lang/rust.vim'
 Plug 'hynek/vim-python-pep8-indent'
+Plug 'sukima/vim-ember-imports'
 
 call plug#end()
 
