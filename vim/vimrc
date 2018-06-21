@@ -75,7 +75,7 @@ Plug 'tpope/vim-abolish'
 
 Plug 'janko-m/vim-test'
 Plug 'benmills/vimux'
-Plug 'benekastah/neomake'
+Plug 'w0rp/ale'
 
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
@@ -154,17 +154,6 @@ if has('nvim')
   tnoremap <C-l> <C-\><C-n><C-w>l
 endif
 
-
-" Neomake settings
-
-" Run neomake on buffer write
-autocmd! BufWritePost * Neomake
-
-" Preserve the cursor position when loclist or quickfix window is opened
-let g:neomake_open_list = 2
-
-" Makers
-let g:neomake_javascript_enabled_makers = ['eslint']
 
 " make test commands execute using vimux
 let test#strategy = 'vimux'
