@@ -162,9 +162,6 @@ let test#strategy = 'vimux'
 let g:deoplete#enable_at_startup = 1
 " let g:deoplete#disable_auto_complete = 1
 
-" Remove parenthesis characters from a candidate word
-call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
-
 " deoplete tab-complete
 inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 
