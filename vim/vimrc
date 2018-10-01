@@ -32,6 +32,9 @@ set nowritebackup
 " Vim diff split
 set diffopt+=vertical
 
+" Default is 4000 i.e. 4s
+" set updatetime=500
+
 " Map the missing Y yank
 nnoremap Y y$
 
@@ -158,6 +161,7 @@ endif
 
 " make test commands execute using vimux
 let test#strategy = 'vimux'
+let g:VimuxHeight = "40"
 
 " Deoplete Seetings
 let g:deoplete#enable_at_startup = 1
