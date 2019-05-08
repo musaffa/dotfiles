@@ -50,12 +50,13 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git rbenv tmux bundler z)
+plugins=(git tmux bundler z)
 
 source $ZSH/oh-my-zsh.sh
 
 # unset OMZ settings
 setopt no_share_history
+unsetopt nomatch
 
 # User configuration
 
@@ -95,7 +96,6 @@ source ~/.zplug/init.zsh
 
 export NVM_AUTO_USE=true
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-zplug 'lukechilds/zsh-nvm'
 zplug 'zsh-users/zsh-syntax-highlighting', defer:2
 
 # Install plugins if there are plugins that have not been installed
@@ -108,3 +108,11 @@ fi
 
 # Then, source plugins and add commands to $PATH
 zplug load
+
+# git shotcuts
+alias gcd='git checkout dev'
+alias gmd='git merge dev'
+
+# asdf
+. $HOME/.asdf/asdf.sh
+. $HOME/.asdf/completions/asdf.bash
