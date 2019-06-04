@@ -91,6 +91,7 @@ Plug 'yalesov/vim-emblem'
 Plug 'joukevandermaas/vim-ember-hbs'
 Plug 'slim-template/vim-slim'
 Plug 'jparise/vim-graphql'
+Plug 'mattn/emmet-vim'
 
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
