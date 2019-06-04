@@ -97,6 +97,7 @@ Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
 Plug 'rust-lang/rust.vim'
 Plug 'hynek/vim-python-pep8-indent'
+Plug 'sukima/vim-javascript-imports'
 Plug 'sukima/vim-ember-imports'
 
 call plug#end()
