@@ -87,9 +87,12 @@ Plug 'tpope/vim-haml'
 Plug 'slim-template/vim-slim'
 
 Plug 'moll/vim-node'
+Plug 'ap/vim-css-color'
 Plug 'yalesov/vim-emblem'
 Plug 'joukevandermaas/vim-ember-hbs'
 Plug 'slim-template/vim-slim'
+Plug 'posva/vim-vue'
+Plug 'maxmellon/vim-jsx-pretty'
 Plug 'jparise/vim-graphql'
 Plug 'mattn/emmet-vim'
 
