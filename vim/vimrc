@@ -42,72 +42,70 @@ nnoremap Y y$
 call plug#begin('~/.vim/plugged')
 
 Plug 'editorconfig/editorconfig-vim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'tpope/vim-repeat'
 
+" treesitter
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+
+" tmux
 Plug 'tmux-plugins/vim-tmux'
 Plug 'christoomey/vim-tmux-navigator'
 
+" theme
 Plug 'lifepillar/vim-solarized8'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'edkolev/tmuxline.vim'
 
-Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-repeat'
-Plug 'metakirby5/codi.vim'
-
+" file navigation
 Plug 'tpope/vim-vinegar'
 Plug 'justinmk/vim-gtfo'
 
-Plug 'Shougo/denite.nvim'
+" fuzzy finder
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+Plug 'nvim-telescope/telescope.nvim'
 
+" git
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+Plug 'lewis6991/gitsigns.nvim'
 
-Plug 'MarcWeber/vim-addon-mw-utils'
-Plug 'tomtom/tlib_vim'
-Plug 'honza/vim-snippets'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" auto pair
+Plug 'windwp/nvim-autopairs'
+Plug 'windwp/nvim-ts-autotag'
 
-Plug 'jiangmiao/auto-pairs'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-surround'
+" tim pope
 Plug 'tpope/vim-unimpaired'
-Plug 'terryma/vim-multiple-cursors'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
 
-Plug 'tpope/vim-abolish'
-
-Plug 'janko-m/vim-test'
-Plug 'benmills/vimux'
-Plug 'w0rp/ale'
-
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-bundler'
-Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-haml'
-Plug 'slim-template/vim-slim'
-
-Plug 'moll/vim-node'
-Plug 'ap/vim-css-color'
-Plug 'yalesov/vim-emblem'
-Plug 'joukevandermaas/vim-ember-hbs'
-Plug 'slim-template/vim-slim'
-Plug 'posva/vim-vue'
-Plug 'maxmellon/vim-jsx-pretty'
-Plug 'jparise/vim-graphql'
+" snippet
 Plug 'mattn/emmet-vim'
 
-Plug 'pangloss/vim-javascript'
-Plug 'leafgarland/typescript-vim'
-Plug 'rust-lang/rust.vim'
-Plug 'hynek/vim-python-pep8-indent'
-Plug 'sukima/vim-ember-imports'
+" selection and replace
+Plug 'terryma/vim-multiple-cursors'
+Plug 'tpope/vim-abolish'
+
+" test
+Plug 'janko-m/vim-test'
+Plug 'benmills/vimux'
+
+" linting and formatting
+Plug 'w0rp/ale'
+
+" language specifics
+Plug 'tpope/vim-bundler'
+Plug 'ap/vim-css-color'
+
+" miscelleneous
+Plug 'metakirby5/codi.vim'
 
 call plug#end()
 
+lua require('init')
 
 " Theme
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-let g:solarized_use16 = 1
 set background=dark
 colorscheme solarized8
 
@@ -122,37 +120,18 @@ let g:netrw_preview = 1
 let g:netrw_alto = 0
 let g:netrw_winsize = 25
 
+" Telescope
+nnoremap <leader>f <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>s <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+
 " Vim test mappings
 nmap <silent> <leader>t :TestNearest<CR>
 nmap <silent> <leader>T :TestFile<CR>
 nmap <silent> <leader>a :TestSuite<CR>
 nmap <silent> <leader>l :TestLast<CR>
 nmap <silent> <leader>g :TestVisit<CR>
-
-
-" Denite settings
-" Denite custom highlights
-call denite#custom#option('_', 'highlight_matched_range', 'None')
-call denite#custom#option('_', 'highlight_matched_char', 'CursorLine')
-
-" Denite custom commands
-call denite#custom#var('file_rec', 'command',
-\ ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', ''])
-
-call denite#custom#var('grep', 'command', ['ag'])
-call denite#custom#var('grep', 'recursive_opts', [])
-call denite#custom#var('grep', 'pattern_opt', [])
-call denite#custom#var('grep', 'separator', [])
-call denite#custom#var('grep', 'final_opts', [])
-call denite#custom#var('grep', 'default_opts',
-\ ['--follow', '--nocolor', '--nogroup', '--smart-case', '--hidden'])
-
-" Denite custom mappings
-call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
-call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
-
-nnoremap <leader>f :<C-u>Denite file_rec<cr>
-nnoremap <leader>s :<C-u>Denite grep<cr>
 
 " Neovim terminal mappings
 if has('nvim')
@@ -168,24 +147,13 @@ endif
 let test#strategy = 'vimux'
 let g:VimuxHeight = "40"
 
-" Deoplete Seetings
-let g:deoplete#enable_at_startup = 1
-" let g:deoplete#disable_auto_complete = 1
-
-" deoplete tab-complete
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-
-" Make sure deoplete is not called when editing with multiple cursors
-function! Multiple_cursors_before()
-  let g:deoplete#disable_auto_complete = 1
-endfunction
-function! Multiple_cursors_after()
-  let g:deoplete#disable_auto_complete = 0
-endfunction
-
+let g:python3_host_prog = "/usr/bin/python3"
 
 " Prettify Json files
 nnoremap <Leader>fj :%!jq '.'<CR>
+
+" ALE
+let g:ale_ruby_rubocop_executable = 'bundle'
 
 " Use slim syntax highlighting for inky files
 autocmd BufNewFile,BufRead *.inky set syntax=slim

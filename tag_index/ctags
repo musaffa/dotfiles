@@ -5,5 +5,4 @@
 --exclude=dist/*
 --exclude=db/*
 --exclude=node_modules/*
---exclude=bower_components/*
 --append
