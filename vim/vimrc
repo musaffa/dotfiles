@@ -120,6 +120,9 @@ let g:netrw_preview = 1
 let g:netrw_alto = 0
 let g:netrw_winsize = 25
 
+" free c-l from netrw's plug mapping
+nmap <leader><leader><leader>l <Plug>NetrwRefresh
+
 " Telescope
 nnoremap <leader>f <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>s <cmd>lua require('telescope.builtin').live_grep()<cr>
