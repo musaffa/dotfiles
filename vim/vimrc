@@ -21,6 +21,10 @@ set expandtab
 set splitright
 set splitbelow
 
+" Theme
+set background=dark
+set termguicolors
+
 " Set Leader key
 let mapleader = ","
 
@@ -54,8 +58,7 @@ Plug 'christoomey/vim-tmux-navigator'
 
 " theme
 Plug 'lifepillar/vim-solarized8'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'itchyny/lightline.vim'
 Plug 'edkolev/tmuxline.vim'
 
 " file navigation
@@ -105,15 +108,14 @@ call plug#end()
 lua require('init')
 
 " Theme
-let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-set background=dark
 colorscheme solarized8
+
+let g:lightline = {
+  \ 'colorscheme': 'solarized',
+  \ }
 
 " EditorConfig settings
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
-
-" Allow powerline symbols to show up
-let g:airline_powerline_fonts = 1
 
 " Explorer settings
 let g:netrw_preview = 1
