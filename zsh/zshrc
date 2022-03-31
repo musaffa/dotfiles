@@ -102,6 +102,7 @@ source $ZSH/oh-my-zsh.sh
 
 alias vim=nvim
 alias mux=tmuxinator
+alias rake='noglob rake'
 
 export VISUAL=vim
 export EDITOR="$VISUAL"
