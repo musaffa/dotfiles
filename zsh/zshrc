@@ -70,7 +70,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux asdf bundler z)
+plugins=(asdf git tmux tmuxinator bundler z)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -136,5 +136,5 @@ alias gmd='git merge dev'
 # autoload -Uz compinit
 # compinit
 
-# fvm - flutter version manager path
-# export PATH="$PATH":"$HOME/.pub-cache/bin"
+# flutter
+export FLUTTER_ROOT="$(asdf where flutter)"
