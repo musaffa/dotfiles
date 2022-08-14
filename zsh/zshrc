@@ -104,8 +104,8 @@ alias vim=nvim
 alias mux=tmuxinator
 alias rake='noglob rake'
 
-export VISUAL=vim
-export EDITOR="$VISUAL"
+export VISUAL=nvim
+export EDITOR=nvim
 bash "$HOME/.vim/plugged/vim-solarized8/scripts/solarized8.sh"
 
 # plugin management
