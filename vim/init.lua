@@ -2,12 +2,24 @@
 -- treesitter
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
-    'ruby',
-    'javascript',
-    'dart',
-    'glimmer',
+    'bash',
     'css',
+    'dart',
+    'dockerfile',
+    'glimmer',
+    'go',
+    'html',
+    'java',
+    'javascript',
     'json',
+    'kotlin',
+    'python',
+    'ruby',
+    -- 'sql',
+    'swift',
+    'toml',
+    'typescript',
+    -- 'xml',
     'yaml'
   },
 
@@ -148,10 +160,10 @@ local lsp_flags = {
 }
 
 local servers = {
-  'solargraph',
-  'tsserver',
+  'dartls',
   'ember',
-  'dartls'
+  'solargraph',
+  'tsserver'
 }
 
 for _, lsp in ipairs(servers) do
