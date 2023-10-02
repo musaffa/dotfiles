@@ -138,3 +138,6 @@ alias gmd='git merge dev'
 
 # flutter
 export FLUTTER_ROOT="$(asdf where flutter)"
+
+# fly commands
+alias deploy-web='chmod 666 nginx.conf && fly deploy --ha=false'
