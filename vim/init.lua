@@ -1,8 +1,9 @@
--- 
+--
 -- treesitter
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
     'bash',
+    'c',
     'css',
     'dart',
     'dockerfile',
@@ -13,13 +14,15 @@ require('nvim-treesitter.configs').setup {
     'javascript',
     'json',
     'kotlin',
+    'lua',
     'python',
     'ruby',
     -- 'sql',
-    'swift',
+    -- 'swift',
     'toml',
     'typescript',
     -- 'xml',
+    'vim',
     'yaml'
   },
 
@@ -117,7 +120,7 @@ cmp.setup.cmdline(':', {
 
 --
 -- lspconfig.
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 local opts = { noremap=true, silent=true }
