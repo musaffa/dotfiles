@@ -93,7 +93,9 @@ Plug 'windwp/nvim-ts-autotag'
 " tim pope
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary'
+
+" Comment
+Plug 'numToStr/Comment.nvim'
 
 " snippet
 Plug 'mattn/emmet-vim'
