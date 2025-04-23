@@ -41,7 +41,7 @@ require("mason").setup()
 require("mason-lspconfig").setup({
   ensure_installed = {
     'solargraph',
-    'tsserver',
+    'ts_ls',
     'ember'
   }
 })
@@ -152,7 +152,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
+  vim.keymap.set('n', '<space>f', vim.lsp.buf.format, bufopts)
 end
 
 local nvim_lsp = require('lspconfig')
@@ -166,7 +166,7 @@ local servers = {
   'dartls',
   'ember',
   'solargraph',
-  'tsserver'
+  'ts_ls'
 }
 
 for _, lsp in ipairs(servers) do
