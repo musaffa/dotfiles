@@ -105,7 +105,6 @@ alias mux=tmuxinator
 
 export VISUAL=nvim
 export EDITOR=nvim
-bash "$HOME/.vim/plugged/vim-solarized8/scripts/solarized8.sh"
 
 # plugin management
 source ~/.zplug/init.zsh
