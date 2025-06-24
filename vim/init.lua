@@ -1,4 +1,10 @@
 --
+-- lualine
+require('lualine').setup {
+  options = { theme = 'solarized_dark' }
+}
+
+--
 -- treesitter
 require('nvim-treesitter.configs').setup {
   ensure_installed = {

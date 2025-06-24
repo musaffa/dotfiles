@@ -71,7 +71,8 @@ Plug 'christoomey/vim-tmux-navigator'
 
 " theme
 Plug 'lifepillar/vim-solarized8'
-Plug 'itchyny/lightline.vim'
+Plug 'nvim-lualine/lualine.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
 Plug 'edkolev/tmuxline.vim'
 
 " file navigation
@@ -121,16 +122,15 @@ Plug 'ap/vim-css-color'
 " miscelleneous
 Plug 'metakirby5/codi.vim'
 
+" performance
+Plug 'dstein64/vim-startuptime'
+
 call plug#end()
 
 lua require('init')
 
 " Theme
 colorscheme solarized8
-
-let g:lightline = {
-  \ 'colorscheme': 'solarized',
-  \ }
 
 " EditorConfig settings
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
