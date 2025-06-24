@@ -1,3 +1,43 @@
+-- If you don't understand a setting in here, just type ':h setting'.
+
+-- Set Leader key
+vim.g.mapleader = ","
+vim.g.maplocalleader = "\\"
+
+vim.opt.linebreak = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.colorcolumn = '81'
+
+-- Set Clipboard
+vim.opt.clipboard = 'unnamedplus'
+
+-- TAB settings
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 2
+vim.opt.expandtab = true
+
+-- Window settings
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- Theme
+vim.opt.termguicolors = true
+
+-- Backup settings
+vim.opt.backupdir = '~/.local/share/nvim/backup'
+vim.opt.directory = '~/.local/share/nvim/swap'
+vim.opt.writebackup = false
+
+-- Vim diff split
+vim.opt.diffopt:append('vertical')
+
+-- plug manager
+require('config.lazy')
+
 --
 -- lualine
 require('lualine').setup {
@@ -226,3 +266,60 @@ require('gitsigns').setup {
 }
 
 require('Comment').setup()
+
+-- Map the missing Y yank
+vim.keymap.set('n', 'Y', 'y$', { noremap=true, silent=true })
+
+vim.cmd [[
+  " Theme
+  colorscheme solarized
+
+  " EditorConfig settings
+  let g:EditorConfig_exclude_patterns = ['fugitive://.*']
+
+  " Explorer settings
+  let g:netrw_preview = 1
+  let g:netrw_alto = 0
+  let g:netrw_winsize = 25
+
+  " free c-l from netrw's plug mapping
+  nmap <leader><leader><leader>l <Plug>NetrwRefresh
+
+  " Telescope
+  nnoremap <leader>f <cmd>lua require('telescope.builtin').find_files()<cr>
+  nnoremap <leader>s <cmd>lua require('telescope.builtin').live_grep()<cr>
+  nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+  nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+
+  " Vim test mappings
+  nmap <silent> <leader>t :TestNearest<CR>
+  nmap <silent> <leader>T :TestFile<CR>
+  nmap <silent> <leader>a :TestSuite<CR>
+  nmap <silent> <leader>l :TestLast<CR>
+  nmap <silent> <leader>g :TestVisit<CR>
+
+  " Neovim terminal mappings
+  if has('nvim')
+    tnoremap <ESC> <C-\><C-n>
+    tnoremap <C-h> <C-\><C-n><C-w>h
+    tnoremap <C-j> <C-\><C-n><C-w>j
+    tnoremap <C-k> <C-\><C-n><C-w>k
+    tnoremap <C-l> <C-\><C-n><C-w>l
+  endif
+
+
+  " make test commands execute using vimux
+  let test#strategy = 'vimux'
+  let g:VimuxHeight = "40"
+
+  let g:python3_host_prog = "/usr/bin/python3"
+
+  " Prettify Json files
+  nnoremap <Leader>fj :%!jq '.'<CR>
+
+  " ALE
+  let g:ale_ruby_rubocop_executable = 'bundle'
+
+  " Use slim syntax highlighting for inky files
+  autocmd BufNewFile,BufRead *.inky set syntax=slim
+]]
