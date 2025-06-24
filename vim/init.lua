@@ -28,8 +28,6 @@ vim.opt.splitbelow = true
 vim.opt.termguicolors = true
 
 -- Backup settings
-vim.opt.backupdir = '~/.local/share/nvim/backup'
-vim.opt.directory = '~/.local/share/nvim/swap'
 vim.opt.writebackup = false
 
 -- Vim diff split
