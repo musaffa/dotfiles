@@ -18,7 +18,6 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
-    { 'editorconfig/editorconfig-vim' },
     { 'nvim-lua/plenary.nvim' },
     { 'tpope/vim-repeat' },
 
@@ -82,7 +81,6 @@ require("lazy").setup({
 
     -- test
     { 'janko-m/vim-test' },
-    { 'benmills/vimux' },
 
     -- linting and formatting
     { 'w0rp/ale' },
@@ -102,5 +100,5 @@ require("lazy").setup({
   -- colorscheme that will be used when installing plugins.
   install = { colorscheme = { 'solarized' } },
   -- automatically check for plugin updates
-  checker = { enabled = true },
+  checker = { enabled = false },
 })
