@@ -1,3 +1,9 @@
+-- Test
+vim.g['test#strategy'] = 'neovim'
+
+-- ALE
+vim.g.ale_ruby_rubocop_executable = 'bundle'
+
 -- treesitter
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
@@ -34,7 +40,4 @@ require('nvim-treesitter.configs').setup {
   }
 }
 
-vim.g['test#strategy'] = 'neovim'
-
--- ALE
-vim.g.ale_ruby_rubocop_executable = 'bundle'
+require('telescope').load_extension('fzf')

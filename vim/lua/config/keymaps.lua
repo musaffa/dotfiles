@@ -1,3 +1,6 @@
+-- free c-l from netrw's plug mapping
+vim.keymap.set('n', '<leader><leader><leader>l', '<Plug>NetrwRefresh')
+
 -- Telescope
 vim.keymap.set('n', '<leader>f', '<cmd>lua require("telescope.builtin").find_files()<cr>', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>s', '<cmd>lua require("telescope.builtin").live_grep()<cr>', { noremap=true, silent=true })
@@ -20,9 +23,6 @@ vim.keymap.set('t', '<C-l>', '<C-\\><C-n><C-w>l', { noremap=true })
 
 -- Map the missing Y yank
 vim.keymap.set('n', 'Y', 'y$', { noremap=true, silent=true })
-
--- free c-l from netrw's plug mapping
-vim.keymap.set('n', '<leader><leader><leader>l', '<Plug>NetrwRefresh')
 
 -- Prettify Json files
 vim.keymap.set('n', '<Leader>fj', ':%!jq .<CR>', { noremap=true })

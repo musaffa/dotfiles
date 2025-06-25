@@ -18,7 +18,6 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
-    { 'nvim-lua/plenary.nvim' },
     { 'tpope/vim-repeat' },
 
     -- lsp
@@ -51,9 +50,11 @@ require("lazy").setup({
     { 'tpope/vim-vinegar' },
     { 'justinmk/vim-gtfo' },
 
-    -- fuzzy finder
+    -- finder
+    { 'nvim-telescope/telescope.nvim',
+      dependencies = { 'nvim-lua/plenary.nvim' }
+    },
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-    { 'nvim-telescope/telescope.nvim' },
 
     -- git
     { 'tpope/vim-fugitive' },
@@ -67,37 +68,29 @@ require("lazy").setup({
     { 'tpope/vim-unimpaired' },
     { 'tpope/vim-surround' },
 
-    -- Comment
-    { 'numToStr/Comment.nvim' },
-
     -- snippet
     { 'mattn/emmet-vim' },
     { 'L3MON4D3/LuaSnip' },
     { 'saadparwaiz1/cmp_luasnip' },
 
     -- selection and replace
-    { 'terryma/vim-multiple-cursors' },
+    { 'mg979/vim-visual-multi' },
     { 'tpope/vim-abolish' },
 
     -- test
     { 'janko-m/vim-test' },
 
     -- linting and formatting
-    { 'w0rp/ale' },
+    { 'dense-analysis/ale' },
 
     -- language specifics
-    { 'reisub0/hot-reload.vim' },
+    { 'autolyticus/hot-reload.vim' },
     { 'tpope/vim-bundler' },
     { 'ap/vim-css-color' },
-
-    -- miscelleneous
-    { 'metakirby5/codi.vim' },
 
     -- performance
     { 'dstein64/vim-startuptime' },
   },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
   install = { colorscheme = { 'solarized' } },
   -- automatically check for plugin updates
   checker = { enabled = false },
