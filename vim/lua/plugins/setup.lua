@@ -1,3 +1,6 @@
+-- theme
+vim.cmd.colorscheme('solarized')
+
 -- Test
 vim.g['test#strategy'] = 'neovim'
 
