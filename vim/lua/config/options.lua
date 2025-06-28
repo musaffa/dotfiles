@@ -2,33 +2,34 @@
 
 -- Set Leader key
 vim.g.mapleader = ","
-vim.g.maplocalleader = "\\"
 
-vim.opt.linebreak = true
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.colorcolumn = '81'
+vim.o.linebreak = true
+vim.o.ignorecase = true
+vim.o.smartcase = true
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.colorcolumn = '81'
 
 -- Set Clipboard
-vim.opt.clipboard = 'unnamedplus'
+vim.schedule(function()
+  vim.o.clipboard = 'unnamedplus'
+end)
 
 -- TAB settings
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.softtabstop = 2
-vim.opt.expandtab = true
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+vim.o.softtabstop = 2
+vim.o.expandtab = true
 
 -- Window settings
-vim.opt.splitright = true
-vim.opt.splitbelow = true
+vim.o.splitright = true
+vim.o.splitbelow = true
 
 -- Theme
-vim.opt.termguicolors = true
+vim.o.termguicolors = true
 
 -- Backup settings
-vim.opt.writebackup = false
+vim.o.writebackup = false
 
 -- Vim diff split
 vim.opt.diffopt:append('vertical')

@@ -42,5 +42,3 @@ require('nvim-treesitter.configs').setup {
     enable = true
   }
 }
-
-require('telescope').load_extension('fzf')

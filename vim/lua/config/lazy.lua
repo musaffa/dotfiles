@@ -18,7 +18,17 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require('lazy').setup({
   spec = {
-    { 'tpope/vim-repeat' },
+    -- navigation
+    { 'tmux-plugins/vim-tmux' },
+    { 'christoomey/vim-tmux-navigator' },
+    { 'tpope/vim-vinegar' },
+    { 'justinmk/vim-gtfo' },
+
+    -- theme
+    { 'ishan9299/nvim-solarized-lua' },
+    { 'nvim-lualine/lualine.nvim', opts = { theme = 'solarized_dark' } },
+    { 'nvim-tree/nvim-web-devicons' },
+    { 'edkolev/tmuxline.vim' },
 
     -- treesitter
     { 'nvim-treesitter/nvim-treesitter', lazy = false, build = ':TSUpdate' },
@@ -27,63 +37,50 @@ require('lazy').setup({
     { 'williamboman/mason-lspconfig.nvim',
       dependencies = {
         { 'mason-org/mason.nvim', opts = {} },
-        'neovim/nvim-lspconfig',
+        'neovim/nvim-lspconfig'
+      }
+    },
+
+    -- finder
+    { 'nvim-telescope/telescope.nvim',
+      dependencies = {
+        'nvim-lua/plenary.nvim',
+        { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+        { 'nvim-telescope/telescope-ui-select.nvim' },
       }
     },
 
     -- autocomplete
     { 'saghen/blink.cmp', version = '1.*' },
 
-    -- tmux
-    { 'tmux-plugins/vim-tmux' },
-    { 'christoomey/vim-tmux-navigator' },
-
-    -- theme
-    { 'ishan9299/nvim-solarized-lua' },
-    { 'nvim-lualine/lualine.nvim', opts = { theme = 'solarized_dark' } },
-    { 'nvim-tree/nvim-web-devicons' },
-    { 'edkolev/tmuxline.vim' },
-
-    -- file navigation
-    { 'tpope/vim-vinegar' },
-    { 'justinmk/vim-gtfo' },
-
-    -- finder
-    { 'nvim-telescope/telescope.nvim',
-      dependencies = { 'nvim-lua/plenary.nvim' }
-    },
-    { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+    -- linting and formatting
+    { 'dense-analysis/ale' },
+    { 'stevearc/conform.nvim' },
 
     -- git
     { 'tpope/vim-fugitive' },
     { 'lewis6991/gitsigns.nvim' },
 
-    -- auto pair
-    { 'windwp/nvim-autopairs' },
-    { 'windwp/nvim-ts-autotag' },
-
-    -- tim pope
+    -- keymaps and cmd
+    { 'tpope/vim-repeat' },
     { 'tpope/vim-unimpaired' },
     { 'tpope/vim-surround' },
+    { 'tpope/vim-abolish' },
+    { 'mg979/vim-visual-multi' },
 
     -- snippet
     { 'L3MON4D3/LuaSnip' },
+    { 'windwp/nvim-autopairs' },
+    { 'windwp/nvim-ts-autotag' },
     -- { 'mattn/emmet-vim' },
 
-    -- selection and replace
-    { 'mg979/vim-visual-multi' },
-    { 'tpope/vim-abolish' },
+    -- language specifics
+    { 'autolyticus/hot-reload.vim' }, -- flutter
+    { 'tpope/vim-bundler' },
+    { 'ap/vim-css-color' },
 
     -- test
     { 'janko-m/vim-test' },
-
-    -- linting and formatting
-    { 'dense-analysis/ale' },
-
-    -- language specifics
-    { 'autolyticus/hot-reload.vim' },
-    { 'tpope/vim-bundler' },
-    { 'ap/vim-css-color' },
 
     -- performance
     { 'dstein64/vim-startuptime' },
