@@ -31,7 +31,12 @@ require('lazy').setup {
     { 'edkolev/tmuxline.vim' },
 
     -- treesitter
-    { 'nvim-treesitter/nvim-treesitter', lazy = false, build = ':TSUpdate' },
+    {
+      'nvim-treesitter/nvim-treesitter',
+      lazy = false,
+      branch = 'master',
+      build = ':TSUpdate',
+    },
 
     -- mason
     { 'mason-org/mason.nvim', opts = {} },

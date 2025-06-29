@@ -8,7 +8,6 @@ vim.g['test#strategy'] = 'neovim'
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
     'bash',
-    'c',
     'css',
     'dart',
     'dockerfile',
@@ -19,15 +18,13 @@ require('nvim-treesitter.configs').setup {
     'javascript',
     'json',
     'kotlin',
-    'lua',
     'python',
     'ruby',
-    -- 'sql',
+    'sql',
     -- 'swift',
     'toml',
     'typescript',
-    -- 'xml',
-    'vim',
+    'xml',
     'yaml',
   },
 
