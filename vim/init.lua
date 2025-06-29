@@ -8,5 +8,6 @@ require 'plugins.cmp'
 require 'plugins.snippets'
 require 'plugins.vcs'
 require 'plugins.format'
+require 'plugins.lint'
 
 require 'config.keymaps'
