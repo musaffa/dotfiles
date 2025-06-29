@@ -9,5 +9,6 @@ require 'plugins.snippets'
 require 'plugins.vcs'
 require 'plugins.format'
 require 'plugins.lint'
+require 'plugins.tester'
 
 require 'config.keymaps'

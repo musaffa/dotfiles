@@ -33,7 +33,7 @@ require('lazy').setup {
     -- treesitter
     { 'nvim-treesitter/nvim-treesitter', lazy = false, build = ':TSUpdate' },
 
-    -- lsp
+    -- mason
     { 'mason-org/mason.nvim', opts = {} },
     {
       'williamboman/mason-lspconfig.nvim',
@@ -83,7 +83,14 @@ require('lazy').setup {
     { 'ap/vim-css-color' },
 
     -- test
-    { 'janko-m/vim-test' },
+    {
+      'nvim-neotest/neotest',
+      dependencies = {
+        'nvim-neotest/nvim-nio',
+        'nvim-lua/plenary.nvim',
+        'olimorris/neotest-rspec',
+      },
+    },
 
     -- performance
     { 'dstein64/vim-startuptime' },
