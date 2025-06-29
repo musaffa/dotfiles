@@ -4,17 +4,24 @@ require('mason-tool-installer').setup {
   },
 }
 
+local formatters = {
+  lua = { 'stylua' },
+  javascript = { 'prettierd', 'prettier', stop_after_first = true },
+  dart = { 'dart_format' },
+}
+
+local ruby = tonumber(vim.fn.system('ruby -v'):match 'ruby (%d+)')
+
+if ruby and ruby >= 3 then
+  formatters.ruby = { 'rubocop' } -- old rubocop has missing params
+end
+
 require('conform').setup {
   format_on_save = {
-    timeout_ms = 1000,
+    timeout_ms = 2000,
     lsp_format = 'fallback',
   },
-  formatters_by_ft = {
-    javascript = { 'prettierd', 'prettier', stop_after_first = true },
-    -- ruby = { 'rubocop' },
-    dart = { 'dart_format' },
-    lua = { 'stylua' },
-  },
+  formatters_by_ft = formatters,
 }
 
 vim.keymap.set({ 'n', 'v', 'i' }, '<leader>f', function()
