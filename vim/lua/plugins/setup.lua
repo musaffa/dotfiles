@@ -1,5 +1,5 @@
 -- theme
-vim.cmd.colorscheme('solarized')
+vim.cmd.colorscheme 'solarized'
 
 -- Test
 vim.g['test#strategy'] = 'neovim'
@@ -31,14 +31,14 @@ require('nvim-treesitter.configs').setup {
     'typescript',
     -- 'xml',
     'vim',
-    'yaml'
+    'yaml',
   },
 
   highlight = {
-    enable = true
+    enable = true,
   },
 
   autotag = {
-    enable = true
-  }
+    enable = true,
+  },
 }

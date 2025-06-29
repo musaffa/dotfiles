@@ -1,8 +1,8 @@
 -- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system({ 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath })
+  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
@@ -16,7 +16,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Setup lazy.nvim
-require('lazy').setup({
+require('lazy').setup {
   spec = {
     -- navigation
     { 'tmux-plugins/vim-tmux' },
@@ -34,20 +34,23 @@ require('lazy').setup({
     { 'nvim-treesitter/nvim-treesitter', lazy = false, build = ':TSUpdate' },
 
     -- lsp
-    { 'williamboman/mason-lspconfig.nvim',
+    { 'mason-org/mason.nvim', opts = {} },
+    {
+      'williamboman/mason-lspconfig.nvim',
       dependencies = {
-        { 'mason-org/mason.nvim', opts = {} },
-        'neovim/nvim-lspconfig'
-      }
+        'neovim/nvim-lspconfig',
+      },
     },
+    { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
 
     -- finder
-    { 'nvim-telescope/telescope.nvim',
+    {
+      'nvim-telescope/telescope.nvim',
       dependencies = {
         'nvim-lua/plenary.nvim',
         { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
         { 'nvim-telescope/telescope-ui-select.nvim' },
-      }
+      },
     },
 
     -- autocomplete
@@ -88,4 +91,4 @@ require('lazy').setup({
   install = { colorscheme = { 'solarized' } },
   -- automatically check for plugin updates
   checker = { enabled = false },
-})
+}

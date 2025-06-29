@@ -1,4 +1,10 @@
-require('conform').setup({
+require('mason-tool-installer').setup {
+  ensure_installed = {
+    'stylua',
+  },
+}
+
+require('conform').setup {
   format_on_save = {
     timeout_ms = 500,
     lsp_format = 'fallback',
@@ -7,9 +13,10 @@ require('conform').setup({
     javascript = { 'prettierd', 'prettier', stop_after_first = true },
     -- ruby = { 'rubocop' },
     dart = { 'dart_format' },
-  }
-})
+    lua = { 'stylua' },
+  },
+}
 
-vim.keymap.set({'n', 'v', 'i'}, '<leader>f', function()
+vim.keymap.set({ 'n', 'v', 'i' }, '<leader>f', function()
   require('conform').format { async = true, lsp_format = 'fallback' }
 end, { desc = '[F]ormat buffer' })

@@ -1,16 +1,16 @@
 require('telescope').setup {
   extensions = {
     ['ui-select'] = {
-      require('telescope.themes').get_dropdown()
-    }
-  }
+      require('telescope.themes').get_dropdown(),
+    },
+  },
 }
 
-require('telescope').load_extension('fzf')
-require('telescope').load_extension('ui-select')
+require('telescope').load_extension 'fzf'
+require('telescope').load_extension 'ui-select'
 
 -- keymap
-local builtin = require('telescope.builtin')
+local builtin = require 'telescope.builtin'
 
 vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>ss', builtin.live_grep, { desc = '[S]earch by [G]rep' })
