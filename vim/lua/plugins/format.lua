@@ -16,7 +16,9 @@ if ruby and ruby >= 3 then
   formatters.ruby = { 'rubocop' } -- old rubocop has missing params
 end
 
-require('conform').setup {
+local conform = require 'conform'
+
+conform.setup {
   format_on_save = {
     timeout_ms = 2000,
     lsp_format = 'fallback',
@@ -25,5 +27,5 @@ require('conform').setup {
 }
 
 vim.keymap.set({ 'n', 'v', 'i' }, '<leader>f', function()
-  require('conform').format { async = true, lsp_format = 'fallback' }
+  conform.format { async = true, lsp_format = 'fallback' }
 end, { desc = '[F]ormat buffer' })

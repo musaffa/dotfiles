@@ -22,5 +22,4 @@ vim.keymap.set('n', '<leader>ta', function()
 end, {})
 
 vim.keymap.set('n', '<leader>tl', neotest.run.run_last, {})
-
 vim.keymap.set('n', '<leader>to', neotest.output_panel.toggle, {})

@@ -1,4 +1,6 @@
-require('telescope').setup {
+local telescope = require 'telescope'
+
+telescope.setup {
   extensions = {
     ['ui-select'] = {
       require('telescope.themes').get_dropdown(),
@@ -6,8 +8,8 @@ require('telescope').setup {
   },
 }
 
-require('telescope').load_extension 'fzf'
-require('telescope').load_extension 'ui-select'
+telescope.load_extension 'fzf'
+telescope.load_extension 'ui-select'
 
 -- keymap
 local builtin = require 'telescope.builtin'
