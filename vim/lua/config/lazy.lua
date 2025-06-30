@@ -88,14 +88,15 @@ require('lazy').setup {
     { 'ap/vim-css-color' },
 
     -- test
-    {
-      'nvim-neotest/neotest',
-      dependencies = {
-        'nvim-neotest/nvim-nio',
-        'nvim-lua/plenary.nvim',
-        'olimorris/neotest-rspec',
-      },
-    },
+    { 'janko-m/vim-test' },
+    -- {
+    --   'nvim-neotest/neotest',
+    --   dependencies = {
+    --     'nvim-neotest/nvim-nio',
+    --     'nvim-lua/plenary.nvim',
+    --     'olimorris/neotest-rspec',
+    --   },
+    -- },
 
     -- performance
     { 'dstein64/vim-startuptime' },

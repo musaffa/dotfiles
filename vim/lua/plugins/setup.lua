@@ -1,9 +1,6 @@
 -- theme
 vim.cmd.colorscheme 'solarized'
 
--- Test
-vim.g['test#strategy'] = 'neovim'
-
 -- treesitter
 require('nvim-treesitter.configs').setup {
   ensure_installed = {
