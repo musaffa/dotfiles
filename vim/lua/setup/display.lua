@@ -1,6 +1,3 @@
--- theme
-vim.cmd.colorscheme 'solarized'
-
 -- treesitter
 require('nvim-treesitter.configs').setup {
   ensure_installed = {

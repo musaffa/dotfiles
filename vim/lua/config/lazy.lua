@@ -18,24 +18,41 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require('lazy').setup {
   spec = {
+    -- library
+    { 'nvim-lua/plenary.nvim' },
+
     -- navigation
     { 'tmux-plugins/vim-tmux' },
     { 'christoomey/vim-tmux-navigator' },
     { 'tpope/vim-vinegar' },
     { 'justinmk/vim-gtfo' },
 
-    -- theme
-    { 'ishan9299/nvim-solarized-lua' },
-    { 'nvim-lualine/lualine.nvim', opts = { theme = 'solarized_dark' } },
+    -- display
+    {
+      'ishan9299/nvim-solarized-lua',
+      config = function()
+        vim.cmd.colorscheme 'solarized'
+      end,
+    },
     { 'nvim-tree/nvim-web-devicons' },
+    { 'nvim-lualine/lualine.nvim', opts = { theme = 'solarized_dark' } },
     { 'edkolev/tmuxline.vim' },
-
-    -- treesitter
     {
       'nvim-treesitter/nvim-treesitter',
       lazy = false,
       branch = 'master',
       build = ':TSUpdate',
+      dependencies = {
+        {
+          'OXY2DEV/markview.nvim',
+          opts = {
+            preview = {
+              filetypes = { 'markdown', 'codecompanion' },
+              ignore_buftypes = {},
+            },
+          },
+        },
+      },
     },
 
     -- mason
@@ -52,7 +69,6 @@ require('lazy').setup {
     {
       'nvim-telescope/telescope.nvim',
       dependencies = {
-        'nvim-lua/plenary.nvim',
         { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
         { 'nvim-telescope/telescope-ui-select.nvim' },
       },
@@ -62,10 +78,54 @@ require('lazy').setup {
     { 'saghen/blink.cmp', version = '1.*' },
 
     -- linting and formatting
-    { 'dense-analysis/ale' },
+    {
+      'dense-analysis/ale',
+      config = function()
+        vim.g.ale_ruby_rubocop_executable = 'bundle'
+      end,
+    },
     { 'stevearc/conform.nvim' },
     { 'windwp/nvim-autopairs' },
     { 'windwp/nvim-ts-autotag' },
+
+    -- llm
+    { 'ravitemer/mcphub.nvim' },
+
+    -- agent
+    {
+      'zbirenbaum/copilot.lua',
+      cmd = 'Copilot',
+      event = 'InsertEnter',
+      config = function()
+        require('copilot').setup {
+          suggestion = {
+            auto_trigger = true,
+            keymap = {
+              accept = '<M-y>',
+              dismiss = '<M-e>',
+            },
+          },
+        }
+
+        vim.api.nvim_create_autocmd('User', {
+          pattern = 'BlinkCmpMenuOpen',
+          callback = function()
+            vim.b.copilot_suggestion_hidden = true
+          end,
+        })
+
+        vim.api.nvim_create_autocmd('User', {
+          pattern = 'BlinkCmpMenuClose',
+          callback = function()
+            vim.b.copilot_suggestion_hidden = false
+          end,
+        })
+      end,
+    },
+
+    -- assistant
+    { 'olimorris/codecompanion.nvim', opts = {} },
+    { 'echasnovski/mini.diff' },
 
     -- git
     { 'tpope/vim-fugitive' },
@@ -89,7 +149,6 @@ require('lazy').setup {
     --   'nvim-neotest/neotest',
     --   dependencies = {
     --     'nvim-neotest/nvim-nio',
-    --     'nvim-lua/plenary.nvim',
     --     'olimorris/neotest-rspec',
     --   },
     -- },
