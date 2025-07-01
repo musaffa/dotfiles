@@ -1,6 +1,3 @@
--- free c-l from netrw's plug mapping
-vim.keymap.set('n', '<leader><leader><leader>l', '<Plug>NetrwRefresh')
-
 -- Neovim terminal mappings
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { noremap = true })
 vim.keymap.set('t', '<C-h>', '<C-\\><C-n><C-w>h', { noremap = true })
@@ -12,4 +9,4 @@ vim.keymap.set('t', '<C-l>', '<C-\\><C-n><C-w>l', { noremap = true })
 vim.keymap.set('n', 'Y', 'y$', { noremap = true, silent = true })
 
 -- Prettify Json files
-vim.keymap.set('n', '<Leader>fj', ':%!jq .<CR>', { noremap = true })
+vim.keymap.set('n', '<Leader>pj', ':%!jq .<CR>', { noremap = true })
