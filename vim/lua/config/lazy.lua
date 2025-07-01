@@ -64,6 +64,8 @@ require('lazy').setup {
     -- linting and formatting
     { 'dense-analysis/ale' },
     { 'stevearc/conform.nvim' },
+    { 'windwp/nvim-autopairs' },
+    { 'windwp/nvim-ts-autotag' },
 
     -- git
     { 'tpope/vim-fugitive' },
@@ -75,12 +77,6 @@ require('lazy').setup {
     { 'tpope/vim-surround' },
     { 'tpope/vim-abolish' },
     { 'mg979/vim-visual-multi' },
-
-    -- snippet
-    { 'L3MON4D3/LuaSnip' },
-    { 'windwp/nvim-autopairs' },
-    { 'windwp/nvim-ts-autotag' },
-    -- { 'mattn/emmet-vim' },
 
     -- language specifics
     { 'autolyticus/hot-reload.vim' }, -- flutter
