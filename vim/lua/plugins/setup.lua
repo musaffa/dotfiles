@@ -15,6 +15,7 @@ require('nvim-treesitter.configs').setup {
     'javascript',
     'json',
     'kotlin',
+    'markdown',
     'python',
     'ruby',
     'sql',
