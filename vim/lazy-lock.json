@@ -1,7 +1,7 @@
 {
   "ale": { "branch": "master", "commit": "9e49019a2683bff012d53f28546ff968075ea3b9" },
   "blink.cmp": { "branch": "main", "commit": "9bcb14b43852a6f2bfd5ac9ef29cb5cf09b1b39b" },
-  "codecompanion.nvim": { "branch": "main", "commit": "0b3831ddee88a389aa663fb05e35f2724f6df7da" },
+  "codecompanion.nvim": { "branch": "main", "commit": "ba140d819b817c2dbfd047a14fd151f5dc5279e0" },
   "conform.nvim": { "branch": "master", "commit": "973f3cb73887d510321653044791d7937c7ec0fa" },
   "fidget.nvim": { "branch": "main", "commit": "d9ba6b7bfe29b3119a610892af67602641da778e" },
   "gitsigns.nvim": { "branch": "main", "commit": "588264bee92993df92535b6742576f5655c91b1c" },
