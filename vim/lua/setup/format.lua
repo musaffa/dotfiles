@@ -6,7 +6,7 @@ require('mason-tool-installer').setup {
 
 local formatters = {
   lua = { 'stylua' },
-  javascript = { 'prettierd', 'prettier', stop_after_first = true },
+  javascript = { 'prettier' },
   dart = { 'dart_format' },
 }
 
