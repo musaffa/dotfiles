@@ -86,7 +86,7 @@ require('lazy').setup {
     },
     { 'stevearc/conform.nvim' },
     { 'windwp/nvim-autopairs' },
-    { 'windwp/nvim-ts-autotag' },
+    { 'windwp/nvim-ts-autotag', opts = {} },
 
     -- llm
     { 'ravitemer/mcphub.nvim' },
