@@ -27,7 +27,7 @@ require('lazy').setup {
     { 'tpope/vim-vinegar' },
     { 'justinmk/vim-gtfo' },
 
-    -- display
+    -- ui
     {
       'ishan9299/nvim-solarized-lua',
       config = function()
@@ -37,6 +37,9 @@ require('lazy').setup {
     { 'nvim-tree/nvim-web-devicons' },
     { 'nvim-lualine/lualine.nvim', opts = { theme = 'solarized_dark' } },
     { 'edkolev/tmuxline.vim' },
+    { 'j-hui/fidget.nvim' },
+
+    -- syntax
     {
       'nvim-treesitter/nvim-treesitter',
       lazy = false,
@@ -92,8 +95,7 @@ require('lazy').setup {
     { 'ravitemer/mcphub.nvim' },
 
     -- assistant
-    { 'olimorris/codecompanion.nvim', opts = {} },
-    { 'echasnovski/mini.diff' },
+    { 'olimorris/codecompanion.nvim' },
 
     -- git
     { 'tpope/vim-fugitive' },

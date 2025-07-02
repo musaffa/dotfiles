@@ -1,3 +1,5 @@
+require('plugins.codecompanion.fidget-spinner'):init()
+
 require('codecompanion').setup {
   extensions = {
     mcphub = {
@@ -35,9 +37,6 @@ require('codecompanion').setup {
     end,
   },
 }
-
-local diff = require 'mini.diff'
-diff.setup { source = diff.gen_source.none() }
 
 vim.keymap.set({ 'n', 'v' }, '<leader>cs', '<cmd>CodeCompanionActions<cr>', { noremap = true, silent = true })
 vim.keymap.set({ 'n', 'v' }, '<Leader>ct', '<cmd>CodeCompanionChat Toggle<cr>', { noremap = true, silent = true })
