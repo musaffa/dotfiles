@@ -11,11 +11,6 @@ require('codecompanion').setup {
       },
     },
   },
-  display = {
-    action_palette = {
-      provider = 'telescope',
-    },
-  },
   strategies = {
     chat = {
       adapter = 'gemini',
