@@ -91,38 +91,6 @@ require('lazy').setup {
     -- llm
     { 'ravitemer/mcphub.nvim' },
 
-    -- agent
-    {
-      'zbirenbaum/copilot.lua',
-      cmd = 'Copilot',
-      event = 'InsertEnter',
-      config = function()
-        require('copilot').setup {
-          suggestion = {
-            auto_trigger = true,
-            keymap = {
-              accept = '<M-y>',
-              dismiss = '<M-e>',
-            },
-          },
-        }
-
-        vim.api.nvim_create_autocmd('User', {
-          pattern = 'BlinkCmpMenuOpen',
-          callback = function()
-            vim.b.copilot_suggestion_hidden = true
-          end,
-        })
-
-        vim.api.nvim_create_autocmd('User', {
-          pattern = 'BlinkCmpMenuClose',
-          callback = function()
-            vim.b.copilot_suggestion_hidden = false
-          end,
-        })
-      end,
-    },
-
     -- assistant
     { 'olimorris/codecompanion.nvim', opts = {} },
     { 'echasnovski/mini.diff' },
