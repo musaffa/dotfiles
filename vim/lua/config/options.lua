@@ -33,3 +33,9 @@ vim.o.writebackup = false
 
 -- Vim diff split
 vim.opt.diffopt:append 'vertical'
+
+vim.filetype.add {
+  extension = {
+    hbs = 'handlebars',
+  },
+}

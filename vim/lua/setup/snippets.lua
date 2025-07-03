@@ -1,4 +1,6 @@
---
+require('luasnip').filetype_extend('handlebars', { 'html' })
+require('luasnip.loaders.from_vscode').lazy_load()
+
 -- autopairs
 local npairs = require 'nvim-autopairs'
 npairs.setup { check_ts = true }

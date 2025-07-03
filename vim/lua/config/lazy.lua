@@ -77,6 +77,17 @@ require('lazy').setup {
       },
     },
 
+    -- snippets
+    {
+      'L3MON4D3/LuaSnip',
+      version = 'v2.*',
+      dependencies = {
+        { 'rafamadriz/friendly-snippets' },
+      },
+    },
+    { 'windwp/nvim-autopairs' },
+    { 'windwp/nvim-ts-autotag', opts = {} },
+
     -- autocomplete
     { 'saghen/blink.cmp', version = '1.*' },
 
@@ -88,8 +99,6 @@ require('lazy').setup {
       end,
     },
     { 'stevearc/conform.nvim' },
-    { 'windwp/nvim-autopairs' },
-    { 'windwp/nvim-ts-autotag', opts = {} },
 
     -- llm
     { 'ravitemer/mcphub.nvim' },

@@ -11,6 +11,8 @@ require('blink.cmp').setup {
     },
   },
 
+  snippets = { preset = 'luasnip' },
+
   cmdline = {
     completion = { menu = { auto_show = true } },
     sources = function()

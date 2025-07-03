@@ -1,9 +1,11 @@
 {
+  "LuaSnip": { "branch": "master", "commit": "458560534a73f7f8d7a11a146c801db00b081df0" },
   "ale": { "branch": "master", "commit": "9e49019a2683bff012d53f28546ff968075ea3b9" },
   "blink.cmp": { "branch": "main", "commit": "9bcb14b43852a6f2bfd5ac9ef29cb5cf09b1b39b" },
-  "codecompanion.nvim": { "branch": "main", "commit": "ba140d819b817c2dbfd047a14fd151f5dc5279e0" },
+  "codecompanion.nvim": { "branch": "main", "commit": "0b3831ddee88a389aa663fb05e35f2724f6df7da" },
   "conform.nvim": { "branch": "master", "commit": "973f3cb73887d510321653044791d7937c7ec0fa" },
   "fidget.nvim": { "branch": "main", "commit": "d9ba6b7bfe29b3119a610892af67602641da778e" },
+  "friendly-snippets": { "branch": "main", "commit": "572f5660cf05f8cd8834e096d7b4c921ba18e175" },
   "gitsigns.nvim": { "branch": "main", "commit": "588264bee92993df92535b6742576f5655c91b1c" },
   "hot-reload.vim": { "branch": "master", "commit": "3c4f9358aadd0e400c781bdbff8ef25542d7f729" },
   "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },
