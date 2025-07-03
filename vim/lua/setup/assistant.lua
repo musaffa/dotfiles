@@ -13,13 +13,13 @@ require('codecompanion').setup {
   },
   strategies = {
     chat = {
-      adapter = 'gemini',
+      adapter = vim.env.DEFAULT_ADAPTER,
     },
     inline = {
-      adapter = 'gemini',
+      adapter = vim.env.DEFAULT_ADAPTER,
     },
     cmd = {
-      adapter = 'gemini',
+      adapter = vim.env.DEFAULT_ADAPTER,
     },
   },
   adapters = {
@@ -27,6 +27,15 @@ require('codecompanion').setup {
       return require('codecompanion.adapters').extend('gemini', {
         env = {
           api_key = vim.env.GEMINI_API_KEY,
+        },
+      })
+    end,
+    ollama = function()
+      return require('codecompanion.adapters').extend('ollama', {
+        schema = {
+          model = {
+            default = vim.env.OLLAMA_MODEL,
+          },
         },
       })
     end,
