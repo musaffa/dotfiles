@@ -6,8 +6,10 @@ require('mason-tool-installer').setup {
 
 local formatters = {
   lua = { 'stylua' },
-  javascript = { 'prettier' },
   dart = { 'dart_format' },
+  javascript = { 'prettier' },
+  handlebars = { 'prettier' },
+  css = { 'prettier' },
 }
 
 local ruby = tonumber(vim.fn.system('ruby -v'):match 'ruby (%d+)')
