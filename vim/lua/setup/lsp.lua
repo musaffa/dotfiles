@@ -7,10 +7,8 @@ require('mason-lspconfig').setup {
 }
 
 -- ruby
-local ruby = tonumber(vim.fn.system('ruby -v'):match 'ruby (%d+)')
-
-if ruby and ruby >= 3 then
-  vim.lsp.enable 'ruby_lsp'
+if require('utils.checks').is_ruby_3_plus() then
+  vim.lsp.enable 'ruby_lsp' -- old ruby does not support ruby-lsp
 end
 
 -- Keymaps

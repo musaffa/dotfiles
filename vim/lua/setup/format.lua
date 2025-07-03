@@ -12,9 +12,7 @@ local formatters = {
   css = { 'prettier' },
 }
 
-local ruby = tonumber(vim.fn.system('ruby -v'):match 'ruby (%d+)')
-
-if ruby and ruby >= 3 then
+if require('utils.checks').is_ruby_3_plus() then
   formatters.ruby = { 'rubocop' } -- old rubocop has missing params
 end
 
