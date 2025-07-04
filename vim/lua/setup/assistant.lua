@@ -5,6 +5,9 @@ require('codecompanion').setup {
     history = {
       opts = {
         auto_save = false,
+        title_generation_opts = {
+          model = vim.env.DEFAULT_MODEL,
+        },
       },
     },
   },
