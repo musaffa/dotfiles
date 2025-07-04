@@ -100,11 +100,10 @@ require('lazy').setup {
     },
     { 'stevearc/conform.nvim' },
 
-    -- llm
-    { 'ravitemer/mcphub.nvim' },
-
     -- assistant
     { 'olimorris/codecompanion.nvim' },
+    { 'zbirenbaum/copilot.lua' },
+    { 'raviteme/mcphub.nvim' },
 
     -- git
     { 'tpope/vim-fugitive' },
