@@ -101,7 +101,12 @@ require('lazy').setup {
     { 'stevearc/conform.nvim' },
 
     -- assistant
-    { 'olimorris/codecompanion.nvim' },
+    {
+      'olimorris/codecompanion.nvim',
+      dependencies = {
+        'ravitemer/codecompanion-history.nvim',
+      },
+    },
     { 'zbirenbaum/copilot.lua' },
 
     -- git

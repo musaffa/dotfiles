@@ -1,6 +1,13 @@
 require('plugins.codecompanion.fidget-spinner'):init()
 
 require('codecompanion').setup {
+  extensions = {
+    history = {
+      opts = {
+        auto_save = false,
+      },
+    },
+  },
   strategies = {
     chat = {
       adapter = vim.env.DEFAULT_ADAPTER,
