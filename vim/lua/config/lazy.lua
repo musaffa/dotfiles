@@ -37,6 +37,12 @@ require('lazy').setup {
     { 'nvim-tree/nvim-web-devicons' },
     { 'nvim-lualine/lualine.nvim', opts = { theme = 'solarized_dark' } },
     { 'edkolev/tmuxline.vim' },
+    {
+      'goolord/alpha-nvim',
+      config = function()
+        require('alpha').setup(require('alpha.themes.startify').config)
+      end,
+    },
     { 'j-hui/fidget.nvim' },
 
     -- syntax
