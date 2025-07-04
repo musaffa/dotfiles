@@ -103,7 +103,6 @@ require('lazy').setup {
     -- assistant
     { 'olimorris/codecompanion.nvim' },
     { 'zbirenbaum/copilot.lua' },
-    { 'raviteme/mcphub.nvim' },
 
     -- git
     { 'tpope/vim-fugitive' },
