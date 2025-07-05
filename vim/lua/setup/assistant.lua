@@ -5,9 +5,7 @@ require('codecompanion').setup {
     history = {
       opts = {
         auto_save = false,
-        title_generation_opts = {
-          model = vim.env.DEFAULT_MODEL,
-        },
+        auto_generate_title = false,
       },
     },
     mcphub = {
@@ -51,7 +49,7 @@ require('codecompanion').setup {
 }
 
 vim.keymap.set({ 'n', 'v' }, '<leader>ca', '<cmd>CodeCompanionActions<cr>', { noremap = true, silent = true })
-vim.keymap.set({ 'n', 'v' }, '<Leader>ct', '<cmd>CodeCompanionChat Toggle<cr>', { noremap = true, silent = true })
+vim.keymap.set({ 'n', 'v' }, '<Leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { noremap = true, silent = true })
 vim.keymap.set('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { noremap = true, silent = true })
 
 -- Expand 'cc' into 'CodeCompanion' in the command line
