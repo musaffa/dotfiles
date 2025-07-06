@@ -122,6 +122,11 @@ require('lazy').setup {
         require('mcphub').setup()
       end,
     },
+    {
+      'Davidyz/VectorCode',
+      version = '0.7.6',
+      cmd = 'VectorCode',
+    },
 
     -- git
     { 'tpope/vim-fugitive' },
