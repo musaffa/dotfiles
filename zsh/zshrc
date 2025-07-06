@@ -131,5 +131,8 @@ alias gmd='git merge dev'
 # mise
 eval "$(mise activate zsh)"
 
+# python
+alias python=python3
+
 # fly commands
 alias deploy-web='chmod 666 nginx.conf && fly deploy --ha=false'
