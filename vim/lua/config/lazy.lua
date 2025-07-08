@@ -24,7 +24,7 @@ require('lazy').setup {
     -- navigation
     { 'tmux-plugins/vim-tmux' },
     { 'christoomey/vim-tmux-navigator' },
-    { 'tpope/vim-vinegar' },
+    { 'stevearc/oil.nvim', opts = {}, lazy = false },
     { 'justinmk/vim-gtfo' },
 
     -- ui

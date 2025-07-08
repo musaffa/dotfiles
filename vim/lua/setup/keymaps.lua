@@ -1,4 +1,7 @@
--- Neovim terminal mappings
+-- navigation
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+
+-- Terminal mappings
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { noremap = true })
 vim.keymap.set('t', '<C-h>', '<C-\\><C-n><C-w>h', { noremap = true })
 vim.keymap.set('t', '<C-j>', '<C-\\><C-n><C-w>j', { noremap = true })
