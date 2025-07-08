@@ -24,7 +24,23 @@ require('lazy').setup {
     -- navigation
     { 'tmux-plugins/vim-tmux' },
     { 'christoomey/vim-tmux-navigator' },
-    { 'stevearc/oil.nvim', opts = {}, lazy = false },
+    {
+      'stevearc/oil.nvim',
+      opts = {
+        use_default_keymaps = false,
+        keymaps = {
+          ['<CR>'] = 'actions.select',
+          ['<C-p>'] = 'actions.preview',
+          ['<C-c>'] = { 'actions.close', mode = 'n' },
+          ['-'] = { 'actions.parent', mode = 'n' },
+          ['_'] = { 'actions.open_cwd', mode = 'n' },
+          ['gs'] = { 'actions.change_sort', mode = 'n' },
+          ['gx'] = 'actions.open_external',
+          ['g.'] = { 'actions.toggle_hidden', mode = 'n' },
+        },
+      },
+      lazy = false,
+    },
     { 'justinmk/vim-gtfo' },
 
     -- ui
