@@ -91,13 +91,10 @@ require('lazy').setup {
     { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
 
     -- finder
-    {
-      'nvim-telescope/telescope.nvim',
-      dependencies = {
-        { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-        { 'nvim-telescope/telescope-ui-select.nvim' },
-      },
-    },
+    { 'nvim-telescope/telescope.nvim' },
+    { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+    { 'nvim-telescope/telescope-ui-select.nvim' },
+    { 'princejoogie/dir-telescope.nvim' },
 
     -- snippets
     {
