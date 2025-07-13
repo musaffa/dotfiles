@@ -16,7 +16,7 @@ require('codecompanion').setup {
         make_slash_commands = true,
       },
     },
-    -- vectorcode = {},
+    vectorcode = {},
   },
   strategies = {
     chat = {
