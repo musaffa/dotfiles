@@ -6,6 +6,7 @@ require('nvim-treesitter.configs').setup {
     'dart',
     'dockerfile',
     'elixir',
+    'erlang',
     'glimmer',
     'glimmer_javascript',
     'glimmer_typescript',
