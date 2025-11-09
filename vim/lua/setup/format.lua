@@ -8,6 +8,8 @@ local formatters = {
   lua = { 'stylua' },
   dart = { 'dart_format' },
   javascript = { 'prettier' },
+  python = { 'ruff_format' },
+  elixir = { 'mix' },
   handlebars = { 'prettier' },
   css = { 'prettier' },
 }
