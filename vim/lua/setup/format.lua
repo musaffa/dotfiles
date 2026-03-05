@@ -10,8 +10,10 @@ local formatters = {
   javascript = { 'prettier' },
   python = { 'ruff_format' },
   elixir = { 'mix' },
-  handlebars = { 'prettier' },
   css = { 'prettier' },
+  handlebars = { 'prettier' },
+  ['javascript.glimmer'] = { 'prettier' },
+  ['typescript.glimmer'] = { 'prettier' },
 }
 
 if require('utils.checks').is_ruby_3_plus() then
