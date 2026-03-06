@@ -12,8 +12,6 @@ local formatters = {
   elixir = { 'mix' },
   css = { 'prettier' },
   handlebars = { 'prettier' },
-  ['javascript.glimmer'] = { 'prettier' },
-  ['typescript.glimmer'] = { 'prettier' },
 }
 
 if require('utils.checks').is_ruby_3_plus() then
