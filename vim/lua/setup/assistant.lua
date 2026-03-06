@@ -11,14 +11,12 @@ require('codecompanion').setup {
     mcphub = {
       callback = 'mcphub.extensions.codecompanion',
       opts = {
-        show_result_in_chat = true,
-        make_vars = true,
-        make_slash_commands = true,
+        make_vars = false,
       },
     },
     vectorcode = {},
   },
-  strategies = {
+  interactions = {
     chat = {
       adapter = vim.env.DEFAULT_ADAPTER,
     },
