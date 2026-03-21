@@ -10,6 +10,7 @@ local formatters = {
   javascript = { 'prettier' },
   python = { 'ruff_format' },
   elixir = { 'mix' },
+  kotlin = { 'ktfmt' },
   css = { 'prettier' },
   handlebars = { 'prettier' },
 }
@@ -26,6 +27,11 @@ conform.setup {
     lsp_format = 'fallback',
   },
   formatters_by_ft = formatters,
+  formatters = {
+    ktfmt = {
+      args = { '--google-style', '-' },
+    },
+  },
 }
 
 vim.keymap.set({ 'n', 'v', 'i' }, '<leader>f', function()
