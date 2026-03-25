@@ -1,9 +1,11 @@
 require('mason-lspconfig').setup {
   ensure_installed = {
-    'lua_ls',
-    'ts_ls',
-    'pyright',
     'ember',
+    'expert',
+    'kotlin_lsp',
+    'lua_ls',
+    'pyright',
+    'ts_ls',
   },
 }
 
