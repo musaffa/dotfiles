@@ -1,0 +1,29 @@
+let mapleader = ','
+
+set linebreak
+set ignorecase
+set smartcase
+set number
+set relativenumber
+
+" Set Clipboard
+set clipboard=unnamedplus
+
+" TAB settings
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+
+" Window settings
+set splitright
+set splitbelow
+
+" Map the missing Y yank
+nnoremap <silent> Y y$
+
+" Plugins
+Plug 'terryma/vim-multiple-cursors'
+Plug 'tommcdo/vim-exchange'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
