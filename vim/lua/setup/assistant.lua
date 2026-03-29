@@ -15,10 +15,11 @@ require('codecompanion').setup {
       },
     },
     vectorcode = {},
+    spinner = {},
   },
   interactions = {
     chat = {
-      adapter = vim.env.DEFAULT_ADAPTER,
+      adapter = vim.env.CHAT_ADAPTER,
     },
     inline = {
       adapter = vim.env.DEFAULT_ADAPTER,

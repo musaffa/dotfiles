@@ -125,6 +125,7 @@ require('lazy').setup {
       'olimorris/codecompanion.nvim',
       dependencies = {
         'ravitemer/codecompanion-history.nvim',
+        'franco-ruggeri/codecompanion-spinner.nvim',
       },
     },
     { 'zbirenbaum/copilot.lua' },

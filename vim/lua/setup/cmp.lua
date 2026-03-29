@@ -13,6 +13,12 @@ require('blink.cmp').setup {
 
   snippets = { preset = 'luasnip' },
 
+  sources = {
+    per_filetype = {
+      codecompanion = { 'codecompanion' },
+    },
+  },
+
   cmdline = {
     completion = { menu = { auto_show = true } },
     sources = function()
