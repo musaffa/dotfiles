@@ -1,7 +1,6 @@
 require('mason-lspconfig').setup {
   ensure_installed = {
     'expert',
-    'glint',
     'kotlin_lsp',
     'lua_ls',
     'pyright',
@@ -9,8 +8,31 @@ require('mason-lspconfig').setup {
   },
 }
 
-vim.lsp.config('glint', {
-  cmd = { 'glint-language-server', '--stdio' },
+vim.lsp.config('ts_ls', {
+  filetypes = {
+    'typescript',
+    'javascript',
+    'typescript.glimmer',
+    'javascript.glimmer',
+  },
+  get_language_id = function(_, filetype)
+    local map = {
+      ['typescript.glimmer'] = 'typescript',
+      ['javascript.glimmer'] = 'javascript',
+    }
+    return map[filetype] or filetype
+  end,
+  before_init = function(_, config)
+    local plugin_path = config.root_dir .. '/node_modules/@glint/tsserver-plugin'
+    if vim.fn.isdirectory(plugin_path) == 1 then
+      config.init_options = config.init_options or {}
+      config.init_options.plugins = config.init_options.plugins or {}
+      table.insert(config.init_options.plugins, {
+        name = '@glint/tsserver-plugin',
+        location = plugin_path,
+      })
+    end
+  end,
 })
 
 -- ruby
