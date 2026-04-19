@@ -1,13 +1,17 @@
 require('mason-lspconfig').setup {
   ensure_installed = {
-    'ember',
     'expert',
+    'glint',
     'kotlin_lsp',
     'lua_ls',
     'pyright',
     'ts_ls',
   },
 }
+
+vim.lsp.config('glint', {
+  cmd = { 'glint-language-server', '--stdio' },
+})
 
 -- ruby
 if require('utils.checks').is_ruby_3_plus() then

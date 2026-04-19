@@ -115,6 +115,7 @@ require('lazy').setup {
     {
       'dense-analysis/ale',
       config = function()
+        vim.g.ale_disable_lsp = 1
         vim.g.ale_ruby_rubocop_executable = 'bundle'
       end,
     },
@@ -156,7 +157,7 @@ require('lazy').setup {
     -- language specifics
     { 'autolyticus/hot-reload.vim' }, -- flutter
     { 'tpope/vim-bundler' },
-    { 'ap/vim-css-color' },
+    -- { 'ap/vim-css-color' },
 
     -- test
     { 'janko-m/vim-test' },
