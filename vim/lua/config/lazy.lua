@@ -165,13 +165,6 @@ require('lazy').setup {
 
     -- test
     { 'janko-m/vim-test' },
-    -- {
-    --   'nvim-neotest/neotest',
-    --   dependencies = {
-    --     'nvim-neotest/nvim-nio',
-    --     'olimorris/neotest-rspec',
-    --   },
-    -- },
 
     -- performance
     { 'dstein64/vim-startuptime' },
