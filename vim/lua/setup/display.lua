@@ -1,5 +1,5 @@
 -- treesitter
-require('nvim-treesitter').setup {
+require('nvim-treesitter.configs').setup {
   ensure_installed = {
     'bash',
     'css',
@@ -26,5 +26,9 @@ require('nvim-treesitter').setup {
     'typescript',
     'xml',
     'yaml',
+  },
+
+  highlight = {
+    enable = true,
   },
 }
