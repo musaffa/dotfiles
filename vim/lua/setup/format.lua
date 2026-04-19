@@ -11,13 +11,13 @@ local formatters = {
   dart = { 'dart_format' },
   javascript = { 'prettier' },
   typescript = { 'prettier' },
-  ['typescript.glimmer'] = { 'prettier' },
-  ['javascript.glimmer'] = { 'prettier' },
   python = { 'ruff_format' },
   elixir = { 'mix' },
   kotlin = { 'ktfmt' },
   css = { 'prettier' },
   handlebars = { 'prettier' },
+  ['typescript.glimmer'] = { 'prettier' },
+  ['javascript.glimmer'] = { 'prettier' },
 }
 
 if require('utils.checks').is_ruby_3_plus() then
