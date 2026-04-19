@@ -157,7 +157,11 @@ require('lazy').setup {
     -- language and framework specifics
     { 'autolyticus/hot-reload.vim' }, -- flutter
     { 'tpope/vim-bundler' },
-    -- { 'ap/vim-css-color' },
+    {
+      'catgoose/nvim-colorizer.lua',
+      event = 'BufReadPre',
+      opts = {},
+    },
 
     -- test
     { 'janko-m/vim-test' },
