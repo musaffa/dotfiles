@@ -65,7 +65,7 @@ require('lazy').setup {
     {
       'nvim-treesitter/nvim-treesitter',
       lazy = false,
-      branch = 'master',
+      branch = 'main',
       build = ':TSUpdate',
       dependencies = {
         {
@@ -154,7 +154,7 @@ require('lazy').setup {
     { 'tpope/vim-abolish' },
     { 'mg979/vim-visual-multi' },
 
-    -- language specifics
+    -- language and framework specifics
     { 'autolyticus/hot-reload.vim' }, -- flutter
     { 'tpope/vim-bundler' },
     -- { 'ap/vim-css-color' },
