@@ -14,7 +14,6 @@ require('codecompanion').setup {
         make_vars = false,
       },
     },
-    vectorcode = {},
     spinner = {},
   },
   interactions = {
