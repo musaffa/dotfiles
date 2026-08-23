@@ -25,5 +25,6 @@
     }
   },
   "syntaxHighlightingDisabled": false,
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "preferredNotifChannel": "terminal_bell"
 }
