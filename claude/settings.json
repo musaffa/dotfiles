@@ -26,5 +26,11 @@
   },
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
-  "preferredNotifChannel": "terminal_bell"
+  "preferredNotifChannel": "terminal_bell",
+  "model": "opus[1m]",
+  "statusLine": {
+    "type": "command",
+    "command": "bash \"$HOME/.claude/statusline-command.sh\"",
+    "refreshInterval": 30
+  }
 }
