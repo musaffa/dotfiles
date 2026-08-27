@@ -2,6 +2,7 @@
   "permissions": {
     "defaultMode": "acceptEdits"
   },
+  "model": "opus[1m]",
   "enabledPlugins": {
     "feature-dev@claude-plugins-official": true,
     "andrej-karpathy-skills@karpathy-skills": true,
@@ -24,13 +25,12 @@
       }
     }
   },
-  "syntaxHighlightingDisabled": false,
-  "tui": "fullscreen",
-  "preferredNotifChannel": "terminal_bell",
-  "model": "opus[1m]",
   "statusLine": {
     "type": "command",
     "command": "bash \"$HOME/.claude/statusline-command.sh\"",
     "refreshInterval": 30
-  }
+  },
+  "tui": "fullscreen",
+  "syntaxHighlightingDisabled": false,
+  "preferredNotifChannel": "terminal_bell"
 }
