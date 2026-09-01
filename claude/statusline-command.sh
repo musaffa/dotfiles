@@ -264,6 +264,17 @@ week_resets_at=${f[week_resets_at]}
 load_reset_stamps "$email"
 : "${session_resets_at:=$REPLY_SESSION}"
 : "${week_resets_at:=$REPLY_WEEK}"
+
+# A five-hour window cannot reset more than five hours out. A stamp that
+# claims otherwise — the weekly window's own stamp landing here instead, a
+# stale value a race left behind, anything — is not this window's, so it is
+# dropped rather than shown as a session dozens of hours long. Dropping it
+# here, before the cache write below, keeps the bad value from being handed
+# to the next repaint too.
+if [[ $session_resets_at =~ ^[0-9]+$ ]] && ((session_resets_at - EPOCHSECONDS > 5 * 3600)); then
+  session_resets_at=""
+fi
+
 save_reset_stamps "$email" "$session_resets_at" "$week_resets_at"
 
 add_usage_segment session "${f[session_pct]}" "$session_resets_at" fmt_hm
