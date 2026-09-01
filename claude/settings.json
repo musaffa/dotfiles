@@ -15,5 +15,6 @@
   "outputStyle": "Concise",
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
-  "preferredNotifChannel": "terminal_bell"
+  "preferredNotifChannel": "terminal_bell",
+  "enableArtifact": false
 }
