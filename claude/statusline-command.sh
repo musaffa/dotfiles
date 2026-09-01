@@ -152,7 +152,7 @@ load_reset_stamps() {
 # supply them. Writes nothing when the stamps have not moved — a repaint should
 # not touch the disk — and nothing at all when there is no stamp to record.
 save_reset_stamps() {
-  local account=$1 session=$2 week=$3 line current
+  local account=$1 session=$2 week=$3 line current tmp
   # Only what load_reset_stamps would accept back is worth writing down.
   [[ $session =~ ^[0-9]+$ ]] || session=""
   [[ $week =~ ^[0-9]+$ ]] || week=""
@@ -162,7 +162,14 @@ save_reset_stamps() {
     IFS= read -r current <"$CACHE_RESETS"
     [ "$current" = "$line" ] && return
   fi
-  printf '%s\n' "$line" >"$CACHE_RESETS" 2>/dev/null
+  # Two panes can repaint at once, each with its own idea of the stamps. A
+  # direct `>` write lets their bytes interleave, so the next read gets a line
+  # that is neither one's — write to a private temp file and rename it in,
+  # which lands whole or not at all.
+  tmp="${CACHE_RESETS}.$$" &&
+    printf '%s\n' "$line" >"$tmp" 2>/dev/null &&
+    mv -f "$tmp" "$CACHE_RESETS" 2>/dev/null
+  rm -f "$tmp" 2>/dev/null
 }
 
 # Appends one usage segment: "label NN%" in yellow, then the grey time left
