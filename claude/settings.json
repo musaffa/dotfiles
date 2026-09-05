@@ -3,6 +3,7 @@
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
+  "enableArtifact": false,
   "statusLine": {
     "type": "command",
     "command": "bash \"$HOME/.claude/statusline-command.sh\"",
@@ -16,5 +17,8 @@
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
   "preferredNotifChannel": "terminal_bell",
-  "enableArtifact": false
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
 }

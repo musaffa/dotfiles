@@ -11,7 +11,7 @@ override an agent's own defaults.
 - **"Commit this" means commit.** Do not run the specs first — whether to
   verify is the caller's decision, not a gate. Where verification matters and
   has not happened, say so alongside the commit
-- **No `Co-Authored-By` trailer**, whoever or whatever wrote the change. The
+- **No AI attribution trailer**, whoever or whatever wrote the change. The
   commit's author is the person who made it
 - **Run `stylua vim/` before committing a change under `vim/`** and fix what
   it reports. Formatting is not verification of behaviour; it is the shape the
