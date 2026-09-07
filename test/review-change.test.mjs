@@ -548,6 +548,22 @@ test('the full suite replaces the narrow scopes rather than joining them', async
   assert.ok(!checks.includes('The scope this change implies, as read off the diff'), 'the additive wording is gone')
 })
 
+test('each phase dispatches the agent whose job that phase is', async () => {
+  // Refuting is a narrower job than reviewing and runs on a cheaper agent. The
+  // two were one body once, so a call site left pointing at the reviewer bills
+  // the review tier for a boolean and nothing at runtime would say so.
+  const { calls } = await run({
+    args: {},
+    respond: stub({ scope: scopeOf(), review: (c) => (c.label === 'review:alpha/correctness' ? { findings: [finding()], friction: [] } : noFindings) }),
+  })
+
+  const typeOf = (phase) => [...new Set(calls.filter((c) => c.phase === phase).map((c) => c.agentType))]
+  assert.deepEqual(typeOf('Scope'), ['scout'])
+  assert.deepEqual(typeOf('Checks'), ['verify'])
+  assert.deepEqual(typeOf('Review'), ['review-design'])
+  assert.deepEqual(typeOf('Refute'), ['refute'])
+})
+
 test('the three deep verifiers read the finding three different ways', async () => {
   const deep = await run({
     args: { depth: 'deep' },

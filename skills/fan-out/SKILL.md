@@ -27,7 +27,8 @@ later. The table is documentation and goes stale; the frontmatter is what runs.
 |---|---|---|
 | `plan-change` | Opus | Reads the docs and the code, dispatching `scout` for the paths, then returns a plan naming the alternatives and recommending one. Never edits |
 | `implement` | Sonnet | Writes one already-decided change in one unit. Never commits, never widens, never restructures anything the plan did not pin |
-| `review-design` | Opus | Reviews one dimension of one unit, and refutes another reviewer's finding. Reads only; never edits, never runs tests |
+| `review-design` | Opus | Reviews one dimension of one unit. Reads only; never edits, never runs tests |
+| `refute` | Sonnet | Takes one finding a reviewer raised and tries to break it. Reads only; the verdict is the whole of its answer |
 | `scout` | Haiku | Locates things. Which units a diff touches, where a symbol lives, which test directories cover a file |
 | `verify` | Haiku | Runs the linter and the tests, reports what failed. Fixes nothing |
 
@@ -133,6 +134,11 @@ For a change touching `n` units:
 | 1, or a tree with no unit division | ≤ 26 | ≤ 66 |
 | 2 | ≤ 29 | ≤ 69 |
 | 4 | ≤ 35 | ≤ 75 |
+
+The rows count agents rather than what they cost, and the two no longer
+track each other. Most of every row is verifiers, and a verifier is a
+Sonnet agent answering one narrow question about one finding; the Opus in a
+review run is the `3n + 1` reviews.
 
 Ceilings, not costs, and they do not run at once: the runtime caps concurrency
 against the cores of the machine the run is on. Read the formula off the

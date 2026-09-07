@@ -677,7 +677,7 @@ Read the code around it. ${
 Default to refuted=true when you are uncertain, and set certain=false when that
 is why.`,
           {
-            agentType: 'review-design',
+            agentType: 'refute',
             label: `refute:${f.file.split('/').pop()}:${f.line}${VOTES > 1 ? `/${lensAt(v).key}` : ''}`,
             phase: 'Refute',
             schema: VERDICT_SCHEMA,

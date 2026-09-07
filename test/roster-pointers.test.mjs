@@ -54,3 +54,17 @@ test('every body still ends by reporting friction', () => {
     assert.ok(flat.includes('## What got in your way'), `${name} has no friction section`)
   }
 })
+
+test('every agent the workflow dispatches has a body in the roster', () => {
+  // `agentType` is a string the runtime resolves elsewhere, so a name that
+  // matches no body is not an error here — it is a silent fallback to the
+  // default agent, at whatever model that one runs on.
+  const script = readFileSync(fileURLToPath(new URL('../workflows/review-change.js', import.meta.url)), 'utf8')
+  const dispatched = [...new Set([...script.matchAll(/agentType: '([a-z-]+)'/g)].map((m) => m[1]))].sort()
+  assert.ok(dispatched.length > 0, 'the script dispatches nothing — this test is reading the wrong thing')
+
+  const named = new Map(BODIES.map(({ name, flat }) => [flat.match(/name: ([a-z-]+) /)?.[1], name]))
+  for (const type of dispatched) {
+    assert.ok(named.has(type), `the workflow dispatches \`${type}\` and no body in the roster is named that`)
+  }
+})
