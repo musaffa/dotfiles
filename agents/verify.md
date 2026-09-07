@@ -53,3 +53,9 @@ did not cover.
 
 The linter and the tests are separate results. Report both even when one is
 clean, and never let a linter failure stop you from running the tests.
+
+## What got in your way
+
+Report it apart from the results, and give the time where the time is the
+point. You are the only agent that runs anything, so a suite that cost far more
+wall clock than the change under test warranted is a cost only you can report.

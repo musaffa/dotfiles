@@ -16,8 +16,14 @@ override an agent's own defaults.
 - **Run `stylua vim/` before committing a change under `vim/`** and fix what
   it reports. Formatting is not verification of behaviour; it is the shape the
   committed code has to be in
+- **Run `node --test 'test/*.test.mjs'` before committing a change under
+  `workflows/`, `skills/fan-out/` or `agents/`** and fix what it reports. A
+  workflow script's branches are otherwise reachable only by spending a fan-out
+  on them, the skill restates its constants in prose, and the agent bodies
+  point at docs this repository cannot see, so the suite is the only thing that
+  reads any of it
 
-Those four decide whether a commit happens at all and what it may not carry, so
+Those five decide whether a commit happens at all and what it may not carry, so
 they are stated here where they load before the work does. What the message
 itself says — subject line, whether the change needs a body, what belongs in one
 — is the `commit-message` skill, read while drafting the message. An agent with

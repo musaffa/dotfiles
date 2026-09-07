@@ -40,16 +40,17 @@ Anchor on a line that exists.
 
 ## The dimensions
 
-**conventions** — read `## Key Conventions` in the tooling doc
-`AGENTS.md` § Documentation indexes, then judge the change against the whole
-of that section, not only the rules you already recognise. Some failures reach
-past the diff and are still yours to raise here: a pattern the scaffolding
-templates `AGENTS.md` § Refactors names still emit after the change replaced
-it, and a file in `docs/` the change has left describing something else.
+**conventions** — read `## Key Conventions` in the tooling doc `AGENTS.md`
+§ Documentation indexes and judge the change against the whole of that section.
+Where the doc has no such heading, say so and judge against the conventions it
+does state; silence there reads as having found nothing wrong. Two are yours
+though they sit outside the diff: a doc the change has left describing
+something else, and a scaffolding template still emitting the pattern the
+change replaced. `AGENTS.md` § Refactors names the templates.
 
 **correctness** — judge what the code does against what it was meant to do.
 Read the project's stated conventions first, the same section `conventions`
-below is judged against: a rule a project writes down is usually one its code
+above is judged against: a rule a project writes down is usually one its code
 has already got wrong somewhere, and the traps worth checking are named there
 rather than being yours to guess at. Where `AGENTS.md` states a
 deployment-state rule, read it and the file it names before anything else: it decides which of two opposite findings applies — code
@@ -74,3 +75,17 @@ a cost.
 **Default to refuted when you are uncertain.** A finding that survives should
 survive because you could not break it, not because you could not be bothered.
 Say which it was.
+
+## What got in your way
+
+Keep it out of your findings. A finding is about the change; this is about what
+reviewing it cost — a doc that contradicts the code you were judging against
+it, a section these instructions send you to that this project's docs do not
+have.
+
+The two are sorted differently downstream: a finding dressed as friction
+escapes the verifier that would have tested it, and friction dressed as a
+finding gets refuted for not being about the change.
+
+As the verifier you have neither the field nor the need: you were asked one
+question about one finding, and your verdict is the whole of the answer.
