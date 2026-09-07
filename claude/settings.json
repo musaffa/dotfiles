@@ -1,6 +1,11 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "additionalDirectories": ["/home/musaffa/.dotfiles"]
   },
   "model": "opus[1m]",
   "enableArtifact": false,
@@ -17,8 +22,5 @@
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
   "preferredNotifChannel": "terminal_bell",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
+  "skipWorkflowUsageWarning": true
 }
