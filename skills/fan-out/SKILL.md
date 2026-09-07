@@ -9,8 +9,12 @@ The roster is `~/.claude/agents/`, one file per agent, with one workflow beside
 it in `~/.claude/workflows/`. Both are shared by every project on this machine
 and state no fact about any of them.
 
-Invoking this skill is the authorisation to call the `Workflow` tool. Nothing
-else here is.
+**Reading this skill is not authorisation to spawn a fan-out.** The caller
+asking for one — by name, by asking for a review, or by asking for a workflow —
+is. Where you reached this skill yourself because the work looked like it
+wanted more than one agent, say what the run would cost, in agents, off the
+table below, and wait. A fan-out is the most expensive thing here and the
+caller is the one paying for it.
 
 ## The roster
 
