@@ -19,6 +19,7 @@ const scopeOf = (over = {}) => ({
   units: ['alpha'],
   files: ['alpha/thing'],
   codeFilesChanged: true,
+  codeKinds: ['.rb', 'Rakefile'],
   linter: 'lint --check',
   runners: RUNNERS,
   testScopes: [{ target: 'tests/alpha', width: 'suite' }],
@@ -30,6 +31,7 @@ const scopeOf = (over = {}) => ({
 
 const CHECKS_OK = {
   linterClean: true,
+  linterCommand: 'lint --check',
   linterOffenses: [],
   testCommand: 'test-suite tests/alpha',
   testsResult: 'passed',
@@ -373,14 +375,177 @@ test('a contained code change with no scope named says the checks agent was left
 })
 
 test('every way the run can end returns the same shape', async () => {
-  const KEYS = ['findings', 'checks', 'scope', 'attempted', 'reported', 'friction']
+  // The last four are the ones that make a shortfall legible. A caller reading
+  // `findings: []` cannot otherwise tell a clean review from a run whose
+  // reviewers all died, whose candidates were cut at the cap, or that was never
+  // told which repository to read.
+  const KEYS = ['findings', 'checks', 'scope', 'attempted', 'reported', 'friction', 'repoNamed', 'unreviewed', 'overCap', 'unjudged']
   const typed = await run({ args: 'deep', respond: () => assert.fail('no agent should run') })
+  const bare = await run({ args: '', respond: () => assert.fail('no agent should run') })
+  const dead = await run({ args: {}, respond: byPhase({ Scope: null }) })
   const empty = await run({ args: {}, respond: stub({ scope: scopeOf({ files: [] }) }) })
   const full = await run({ args: {}, respond: stub({ scope: scopeOf() }) })
 
-  for (const [name, r] of [['typed string', typed], ['nothing changed', empty], ['a full run', full]]) {
+  for (const [name, r] of [['typed string', typed], ['bare name', bare], ['dead scout', dead], ['nothing changed', empty], ['a full run', full]]) {
     for (const k of KEYS) assert.ok(k in r.result, `${name} is missing ${k}`)
   }
+})
+
+test('the bare skill name bails as loudly as a typed one', async () => {
+  // The empty string is the likeliest arrival by name and was the one the guard
+  // let through, because it had no option to quote back. It reaches every agent
+  // as an unnamed `repo`, which is the wrong-repository failure.
+  for (const bare of ['', '   ']) {
+    const { result, calls, logs } = await run({ args: bare, respond: () => assert.fail('no agent should run') })
+
+    assert.equal(result.stopped, 'args-not-an-object')
+    assert.equal(calls.length, 0)
+    assert.ok(logged(logs, /Reached by name with no options/))
+  }
+})
+
+test('a scout that died is not reported as nothing having changed', async () => {
+  const { result, calls, logs } = await run({ args: { repo: '/r' }, respond: byPhase({ Scope: null }) })
+
+  assert.equal(result.stopped, 'scope-agent-returned-nothing')
+  assert.equal(calls.length, 1, 'nothing was dispatched behind it')
+  assert.ok(logged(logs, /The scope agent returned nothing/))
+  assert.ok(!logged(logs, /Nothing changed/), 'the opposite fact')
+
+  // The empty diff keeps the old wording, and keeps `stopped` off the return.
+  const none = await run({ args: {}, respond: stub({ scope: scopeOf({ files: [] }) }) })
+  assert.equal(none.result.stopped, undefined)
+  assert.ok(logged(none.logs, /Nothing changed/))
+})
+
+test('an unnamed repo is a fact on the return, not only a log line', async () => {
+  const bare = await run({ args: {}, respond: stub({ scope: scopeOf() }) })
+  assert.equal(bare.result.repoNamed, false)
+
+  const named = await run({ args: { repo: '/r' }, respond: stub({ scope: scopeOf() }) })
+  assert.equal(named.result.repoNamed, true)
+})
+
+test('what a run did not cover comes back on the return, not only in the log', async () => {
+  const many = Array.from({ length: 22 }, (unused, i) => finding({ line: i + 1, summary: `defect number ${i + 1} in the handler` }))
+  const { result } = await run({
+    args: { repo: '/r' },
+    respond: byPhase({
+      Scope: scopeOf(),
+      Checks: CHECKS_OK,
+      Review: (c) => (c.label === 'review:alpha/correctness' ? { findings: many, friction: [] } : c.label === 'review:alpha/tests' ? null : noFindings),
+      // Every verifier dies, so nothing is confirmed and nothing is refuted.
+      Refute: () => null,
+    }),
+  })
+
+  assert.deepEqual(
+    result.unreviewed.map((u) => u.label),
+    ['review:alpha/tests'],
+  )
+  assert.equal(result.overCap.length, 2, '22 findings, 20 verified')
+  assert.deepEqual(result.overCap.map((f) => f.line), [21, 22])
+  assert.equal(result.unjudged.length, 20, 'every candidate lost every verifier')
+  assert.deepEqual(result.findings, [], 'and none of it is a finding')
+})
+
+test('two defects on one line are not merged by a single shared noun', async () => {
+  // `Math.min` normalisation scored these 0.5 — one word in common, out of the
+  // shorter summary's two — and collapsed them into one candidate whose single
+  // refuter answered one claim for both.
+  const { result, calls } = await run({
+    args: { repo: '/r' },
+    respond: stub({
+      scope: scopeOf(),
+      review: (c) =>
+        c.label === 'review:alpha/correctness'
+          ? { findings: [finding({ summary: 'the repository leaks a connection' })], friction: [] }
+          : c.label === 'review:alpha/design'
+            ? { findings: [finding({ summary: 'N+1 query in repository' })], friction: [] }
+            : noFindings,
+    }),
+  })
+
+  assert.equal(result.reported, 2)
+  assert.equal(calls.filter((c) => c.phase === 'Refute').length, 2, 'two defects, two refutations')
+  assert.equal(result.findings.length, 2)
+})
+
+test('a merge that does happen shows the refuter every claim it swallowed', async () => {
+  const { calls } = await run({
+    args: { repo: '/r' },
+    respond: stub({
+      scope: scopeOf(),
+      review: (c) =>
+        c.label === 'review:alpha/correctness'
+          ? { findings: [finding({ summary: 'the deadline is discarded', failure: 'the deadline never applies' })], friction: [] }
+          : c.label === 'review:alpha/tests'
+            ? { findings: [finding({ summary: 'discarded deadline is untested', failure: 'no spec covers it' })], friction: [] }
+            : noFindings,
+    }),
+  })
+
+  const refute = promptFor(calls, 'Refute')
+  assert.ok(refute.includes('discarded deadline is untested'), 'the swallowed claim')
+  assert.ok(refute.includes('no spec covers it'), 'and its failure')
+  assert.ok(refute.includes('leave it standing where ANY of these claims survives'))
+})
+
+test('a code file in the diff outvotes a scout that called the change code-free', async () => {
+  const { calls, logs } = await run({
+    args: { repo: '/r' },
+    respond: stub({ scope: scopeOf({ codeFilesChanged: false, files: ['docs/x.md', 'alpha/thing.rb'] }) }),
+  })
+
+  assert.ok(logged(logs, /came back false, but 1 changed file\(s\) match a kind this project counts as code: alpha\/thing\.rb/))
+  assert.deepEqual(labelsIn(calls, 'Review').sort(), ['review:all/conventions', 'review:alpha/correctness', 'review:alpha/design', 'review:alpha/tests'])
+})
+
+test('a change with no code in it and no code file to find stays a conventions run', async () => {
+  const { calls, logs } = await run({
+    args: { repo: '/r' },
+    respond: stub({ scope: scopeOf({ codeFilesChanged: false, files: ['docs/x.md', 'README.md'], testScopes: [] }) }),
+  })
+
+  assert.deepEqual(labelsIn(calls, 'Review'), ['review:all/conventions'])
+  assert.ok(!logged(logs, /outvote|came back false, but/))
+})
+
+test('a project that named no linter is not reported clean', async () => {
+  const { calls, logs } = await run({ args: { repo: '/r' }, respond: stub({ scope: scopeOf({ linter: '' }) }) })
+
+  assert.ok(logged(logs, /named no linter command/))
+  const checks = promptFor(calls, 'Checks')
+  assert.ok(checks.includes('Do not report clean for a linter you did not run.'))
+  assert.ok(!checks.includes('Run `` over the project'), 'an empty command is not a command')
+})
+
+test('a linter that never ran is logged as that, not as clean', async () => {
+  const { logs } = await run({
+    args: { repo: '/r' },
+    respond: stub({ scope: scopeOf(), checks: { ...CHECKS_OK, linterClean: true, linterCommand: '' } }),
+  })
+
+  assert.ok(logged(logs, /no linter run, which is not the same as clean/))
+})
+
+test('a width the project named no runner for is named, not handed over as a bare path', async () => {
+  const { calls } = await run({
+    args: { repo: '/r' },
+    respond: stub({ scope: scopeOf({ runners: { suite: '', scoped: 'test-one', everything: 'test-all' } }) }),
+  })
+
+  const checks = promptFor(calls, 'Checks')
+  assert.ok(checks.includes('(this project named no `suite` runner) tests/alpha'))
+})
+
+test('the full suite replaces the narrow scopes rather than joining them', async () => {
+  const { calls } = await run({ args: { repo: '/r' }, respond: stub({ scope: scopeOf({ boundaryReach: 'crosses' }) }) })
+
+  const checks = promptFor(calls, 'Checks')
+  assert.ok(checks.includes('test-all'))
+  assert.ok(checks.includes('run it instead of them rather than as well'))
+  assert.ok(!checks.includes('The scope this change implies, as read off the diff'), 'the additive wording is gone')
 })
 
 test('the three deep verifiers read the finding three different ways', async () => {

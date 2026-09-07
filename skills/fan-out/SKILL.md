@@ -134,9 +134,11 @@ Ceilings, not costs, and they do not run at once: the runtime caps concurrency
 against the cores of the machine the run is on. Read the formula off the
 `Workflow` tool description.
 
-A finding is dropped when at least half its verifiers refuted it. At `normal`
-one verifier decides either way; at `deep` one refuter out of three leaves the
-finding standing. Each survivor carries its vote count and its refuter count.
+A finding is dropped when **more** than half its verifiers refuted it, so a tie
+leaves it standing. At `normal` one verifier decides either way; at `deep` one
+refuter out of three leaves the finding standing, and so does one out of two
+where a verifier died. Each survivor carries its vote count and its refuter
+count.
 
 The three at `deep` are not the same question asked three times. Each is given
 one lens — whether the failure can be constructed at all, whether something
@@ -155,6 +157,13 @@ review agent that died, so a dimension went unread rather than finding nothing;
 a candidate whose verifiers all died, so it is neither confirmed nor refuted;
 every finding cut at the cap, by `file:line`; and the linter and test result the
 moment the checks agent lands, which is usually well before the refuters finish.
+
+The first three are on the return as well, as `unreviewed`, `unjudged` and
+`overCap`, beside `repoNamed`. Read them before you read `findings`: an empty
+`findings` means one thing where those are empty too and another where four
+reviewers died, and a log line is not something the caller's return carries.
+Every exit returns all four, including the ones that stop before dispatching
+anything — those carry `stopped` saying which.
 
 Two things it will not tell you unless you look:
 

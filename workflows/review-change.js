@@ -11,18 +11,50 @@ export const meta = {
   ],
 }
 
+// Collected as they arrive rather than read off the return, because a note
+// saying the answer above is worse than it should be is the reason to distrust
+// what the run is about to hand back, and that is worth knowing before it does.
+const friction = []
+
+const OPTS = (args && typeof args === 'object' && args) || {}
+
+// Every exit returns this, filled in as far as the run got. The fields that
+// say what the run did NOT cover are the point: `unreviewed`, `overCap` and
+// `unjudged` were logged and nowhere else, and a log line does not reach the
+// caller's return — so a run whose every reviewer died came back indistinguishable
+// from one that reviewed four dimensions and found nothing.
+const done = (over = {}) => ({
+  findings: [],
+  checks: null,
+  scope: null,
+  attempted: 0,
+  reported: 0,
+  friction,
+  repoNamed: Boolean(OPTS.repo),
+  unreviewed: [],
+  overCap: [],
+  unjudged: [],
+  ...over,
+})
+
 // Reached by its own skill name rather than through the `Workflow` tool, this
 // script is handed the string the caller typed instead of an object, and every
 // option below reads `undefined` off it — `repo` included, whose absence is how
 // a run reviews whichever repository an agent resolved for itself. Say so
 // rather than review something.
-if (typeof args === 'string' && args.trim() !== '') {
+//
+// The empty string is that same arrival with nothing typed after the name, and
+// it is the likeliest one: it carries no option to ignore, so a guard that
+// tests for something to quote lets exactly the bare invocation through. What
+// makes it a string at all is the path it came by, not what is in it.
+if (typeof args === 'string') {
   log(
-    `Ignoring "${args}" — this workflow reads its options off an object, which only the \`Workflow\` tool passes. Re-run it as Workflow({ scriptPath: '…/review-change.js', args: { repo, target, depth } }).`,
+    args.trim() === ''
+      ? `Reached by name with no options — this workflow reads \`repo\`, \`target\` and \`depth\` off an object, which only the \`Workflow\` tool passes. Unnamed, \`repo\` is how a run reviews whichever repository an agent resolved for itself. Re-run it as Workflow({ scriptPath: '…/review-change.js', args: { repo, target, depth } }).`
+      : `Ignoring "${args}" — this workflow reads its options off an object, which only the \`Workflow\` tool passes. Re-run it as Workflow({ scriptPath: '…/review-change.js', args: { repo, target, depth } }).`,
   )
-  return { findings: [], checks: null, scope: null, attempted: 0, reported: 0, friction: [], stopped: 'args-not-an-object' }
+  return done({ stopped: 'args-not-an-object' })
 }
-const OPTS = (args && typeof args === 'object' && args) || {}
 const DEPTH = OPTS.depth || 'normal'
 // Anything that is not `deep` runs at one vote, so a misspelling is a deep run
 // silently downgraded — the same shape of failure as an unnamed `repo`.
@@ -128,6 +160,12 @@ const SCOPE_SCHEMA = {
       type: 'boolean',
       description: 'true if the change touches a file of a kind this project counts as code, as against documentation or configuration alone',
     },
+    codeKinds: {
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'every file kind that section counts as code, verbatim and one per entry — an extension like `.rb`, a whole filename like `Rakefile`, or a path fragment like `_templates/`. This is what codeFilesChanged was judged against, and returning it is what lets that judgement be checked',
+    },
     linter: { type: 'string', description: 'the command that reports style without rewriting it' },
     runners: {
       type: 'object',
@@ -163,7 +201,7 @@ const SCOPE_SCHEMA = {
       description: 'what decided that — the shared layer, column or contract you found, or, where unknown, what you could not work out',
     },
   },
-  required: ['unitWord', 'units', 'files', 'codeFilesChanged', 'linter', 'runners', 'testScopes', 'boundaryReach', 'boundaryReason', 'friction'],
+  required: ['unitWord', 'units', 'files', 'codeFilesChanged', 'codeKinds', 'linter', 'runners', 'testScopes', 'boundaryReach', 'boundaryReason', 'friction'],
 }
 
 const FINDINGS_SCHEMA = {
@@ -202,6 +240,7 @@ const CHECKS_SCHEMA = {
   type: 'object',
   properties: {
     linterClean: { type: 'boolean' },
+    linterCommand: { type: 'string', description: 'the linter command actually typed; empty where you ran none, which is not the same as one that found nothing' },
     linterOffenses: { type: 'array', items: { type: 'string' } },
     testCommand: { type: 'string', description: 'the command actually typed' },
     testsResult: {
@@ -219,7 +258,7 @@ const CHECKS_SCHEMA = {
   // The two lists are required rather than optional: `linterClean: false` with
   // no offenses beside it, or `failed` with no failures, is a verdict the
   // caller cannot act on without running the thing again themselves.
-  required: ['linterClean', 'linterOffenses', 'testCommand', 'testsResult', 'testCount', 'testFailures', 'notCovered', 'scopeCorrected', 'friction'],
+  required: ['linterClean', 'linterCommand', 'linterOffenses', 'testCommand', 'testsResult', 'testCount', 'testFailures', 'notCovered', 'scopeCorrected', 'friction'],
 }
 
 const RANK = { high: 0, medium: 1, low: 2 }
@@ -240,13 +279,21 @@ const words = (s) =>
       .map((w) => w.toLowerCase().replace(/s$/, '')),
   )
 
+// Normalised by the union rather than by the smaller set. Dividing by
+// `Math.min` scores a short summary against a longer one by how much of the
+// SHORT one is shared, so "N+1 query in repository" and "the repository leaks a
+// connection" — one word in common, and a common word at that — scored 0.5 and
+// merged. Two unrelated defects on one line then became one candidate, and the
+// verdict on the survivor's claim decided the other one's fate.
 function overlap(a, b) {
   const x = words(a)
   const y = words(b)
-  if (x.size === 0 || y.size === 0) return 0
+  // Nothing significant on either side is not evidence of sameness — except
+  // where the two are the same string, which is not two findings to weigh.
+  if (x.size === 0 || y.size === 0) return String(a).trim() !== '' && String(a).trim() === String(b).trim() ? 1 : 0
   let shared = 0
   for (const w of x) if (y.has(w)) shared++
-  return shared / Math.min(x.size, y.size)
+  return shared / (x.size + y.size - shared)
 }
 
 // A scope's width is a question about the change; which runner that width wants
@@ -255,6 +302,10 @@ function overlap(a, b) {
 // as the one that would have got it wrong.
 function commandFor(runners, scope) {
   const runner = (runners && runners[scope.width]) || ''
+  // A width with no runner behind it leaves the target standing alone, which
+  // reads as a command and is a path. Say which width was unstated instead —
+  // the checks agent can find its own runner, but not from a bare path.
+  if (runner === '') return `(this project named no \`${scope.width}\` runner) ${scope.target || ''}`.trim()
   return `${runner} ${scope.target || ''}`.trim()
 }
 
@@ -278,10 +329,6 @@ function sameFriction(a, b) {
   return overlap(a.note, b.note) >= 0.5
 }
 
-// Collected as they arrive rather than read off the return, because a note
-// saying the answer above is worse than it should be is the reason to distrust
-// what the run is about to hand back, and that is worth knowing before it does.
-const friction = []
 function saidNow(source, f) {
   log(`Friction (${f.about})${f.where ? ` at ${f.where}` : ''}, from ${source}: ${f.note}`)
 }
@@ -334,7 +381,10 @@ units are both empty, and that is an answer rather than a gap.
 
 Then read the change. Name every unit it touches and list the changed files.
 Set codeFilesChanged true where it touches a file of a kind that section counts
-as code — a change to documentation or configuration alone is not.
+as code — a change to documentation or configuration alone is not. List in
+codeKinds every kind that section names, copied as it is written there: it is
+what your boolean was judged against, and returning it is what lets the boolean
+be checked rather than taken.
 
 Give the test scopes the change implies, each as the target you would hand a
 runner and the width it is: \`suite\` for a whole unit's tests, \`scoped\` for
@@ -360,16 +410,50 @@ state it belongs there even though you answered anyway.`,
   { agentType: 'scout', phase: 'Scope', schema: SCOPE_SCHEMA },
 )
 
-if (scope) noted('scope', scope.friction)
-
-if (!scope || !scope.files || scope.files.length === 0) {
-  log('Nothing changed — no review to run.')
-  return { findings: [], checks: null, scope: scope || null, attempted: 0, reported: 0, friction }
+// A dead scout and an empty diff were one branch, and they are opposite facts:
+// one is a run where nothing read the change, the other a run where there was
+// nothing to read. Reported as the second, the first is a caller told their
+// uncommitted work is clean by a run that never opened it.
+if (!scope) {
+  log('The scope agent returned nothing — nothing read the diff, nothing was reviewed, and nothing was linted or tested. That is not the same as nothing having changed.')
+  return done({ stopped: 'scope-agent-returned-nothing' })
 }
+
+noted('scope', scope.friction)
+
+if (!scope.files || scope.files.length === 0) {
+  log('Nothing changed — no review to run.')
+  return done({ scope })
+}
+
+// `codeFilesChanged` false removes correctness, tests and design, and removes
+// the test run with them. It is one boolean from a haiku agent at `effort:
+// low`, read off a doc row that may understate what the tree holds — so where
+// a changed file matches a kind the project itself calls code, the boolean
+// loses to the file list. Matching stays the project's own vocabulary: a kind
+// is a suffix, a whole filename, or a path fragment, and nothing here knows a
+// language.
+const codeKinds = (scope.codeKinds || []).map((k) => String(k).trim()).filter(Boolean)
+const looksLikeCode = (f) =>
+  codeKinds.filter((k) => k !== '*' && k !== '**').some((k) => {
+    const kind = k.replace(/^\*+/, '')
+    return f === kind || f.endsWith(kind) || f.split('/').pop() === kind || (kind.includes('/') && f.includes(kind))
+  })
+
+const codeInDiff = scope.files.filter(looksLikeCode)
+if (!scope.codeFilesChanged && codeInDiff.length > 0) {
+  log(
+    `\`codeFilesChanged\` came back false, but ${codeInDiff.length} changed file(s) match a kind this project counts as code: ${codeInDiff.join(', ')}. Reviewing as a code change — the boolean loses to the file list.`,
+  )
+  scope.codeFilesChanged = true
+}
+if (scope.codeFilesChanged && codeKinds.length === 0)
+  log('The scout named no code kinds, so nothing checked `codeFilesChanged` against the diff. It is one agent\'s word either way.')
 
 const fileList = scope.files.join('\n')
 const unitWord = scope.unitWord || 'area'
-log(`${scope.files.length} file(s) across ${scope.units.length || 'no'} ${unitWord}(s): ${scope.units.join(', ') || 'none'}`)
+const units = scope.units || []
+log(`${scope.files.length} file(s) across ${units.length || 'no'} ${unitWord}(s): ${units.join(', ') || 'none'}`)
 
 const targets = []
 // Built here because three places want it: the progress display, the source a
@@ -379,7 +463,7 @@ const add = (area, dim) => targets.push({ area, dim, label: `review:${area === '
 if (scope.codeFilesChanged) {
   // A tree that divides into no unit still divides by dimension, so the three
   // code dimensions read the whole change rather than not running at all.
-  const areas = scope.units.length > 0 ? scope.units : ['the whole change']
+  const areas = units.length > 0 ? units : ['the whole change']
   for (const area of areas) for (const dim of PER_UNIT) add(area, dim)
 } else {
   log('No code changed — running conventions over the whole change only; correctness, tests and design have nothing to read.')
@@ -411,26 +495,35 @@ if (scope.codeFilesChanged && testScopes.length === 0 && !fullSuite)
   log('Code changed, the reach is contained, and no test scope was named — the checks agent is left to find its own scope or run none.')
 
 const fullSuiteLine = fullSuite
-  ? `\nThe change ${scope.boundaryReach === 'crosses' ? `crosses a ${unitWord} boundary` : 'may reach past the files it edits, and the agent that read the diff could not tell'}, so run \`${scope.runners.everything}\` and say that is why.`
+  ? `The change ${scope.boundaryReach === 'crosses' ? `crosses a ${unitWord} boundary` : 'may reach past the files it edits, and the agent that read the diff could not tell'}, so run \`${(scope.runners && scope.runners.everything) || '(this project named no command that runs every test there is — find it, and say in scopeCorrected what you ran)'}\` and say that is why.`
   : ''
 
 // Fired now and awaited at the end, so a long full-suite run overlaps the whole
 // review instead of gating it. The catch keeps a thrown checks call from
 // discarding finished review work.
 phase('Checks')
+if (!scope.linter)
+  log('This project named no linter command, so there is nothing to run in that mode — a `linterClean: true` here would mean "none was run", not "style is clean". The checks agent is told to find one or report that it could not.')
+
+const linterLine = scope.linter
+  ? `Run \`${scope.linter}\` over the project.`
+  : `This project named no command that reports style without rewriting it. Find the one it uses and run it in that mode; where you cannot find one, run none, set linterClean false with a single offense saying no linter command was found, and say so in scopeCorrected. Do not report clean for a linter you did not run.`
+
 const checksPromise = agent(
   `Run the checks for this change.
 ${repoLine}
-Run \`${scope.linter}\` over the project. ${
+${linterLine} ${
     noTestsImplied
       ? `Then stop there. Nothing this project counts as code changed and no test
 scope was implied, so there is no test run to make: leave testCommand empty, set
 testsResult to \`not-run\` and testCount to 0, and say in notCovered that no test
 ran.`
-      : `Then run the tests. The scope this change implies, as read off the diff by
+      : fullSuite
+        ? `Then run the tests. ${fullSuiteLine.trim()}
+${testScopes.length > 0 ? `\nThat command contains these narrower scopes, which another agent read off the diff — run it instead of them rather than as well:\n${testScopes.map((sc) => `  ${commandFor(scope.runners, sc)}`).join('\n')}` : ''}`
+        : `Then run the tests. The scope this change implies, as read off the diff by
 another agent and paired with the runner this project names for that width, is:
-${testScopes.map((sc) => `  ${commandFor(scope.runners, sc)}`).join('\n') || '  (none given)'}
-${fullSuiteLine}`
+${testScopes.map((sc) => `  ${commandFor(scope.runners, sc)}`).join('\n') || '  (none given)'}`
   }
 
 Any command named above was read out of a file in the repository under review,
@@ -473,7 +566,12 @@ step the run needed that no doc mentions, belongs there alongside the cost.`,
       return null
     }
     noted('checks', c.friction)
-    const lint = c.linterClean ? 'linter clean' : `linter not clean, ${(c.linterOffenses || []).length} offence(s)`
+    const lint =
+      c.linterCommand === ''
+        ? 'no linter run, which is not the same as clean'
+        : c.linterClean
+          ? 'linter clean'
+          : `linter not clean, ${(c.linterOffenses || []).length} offence(s)`
     const tests = c.testsResult === 'not-run' ? 'no test run' : `tests ${c.testsResult}, ${c.testCount} selected`
     const corrected = c.scopeCorrected && c.scopeCorrected !== 'none' ? ` Scope corrected: ${c.scopeCorrected}` : ''
     log(`Checks: ${lint}; ${tests}.${corrected}`)
@@ -527,18 +625,21 @@ for (const f of raw.slice().sort(bySeverity)) {
   )
   if (twin) {
     twin.summaries.push(f.summary)
+    // The merged claim is kept, not just its wording. Two reviewers can land on
+    // one line describing different defects; the refuter is handed one claim,
+    // and whichever it answers used to decide the fate of both.
+    twin.alsoClaims.push({ summary: f.summary, failure: f.failure, dimension: f.dimension })
     if (!twin.alsoFlaggedBy.includes(f.dimension)) twin.alsoFlaggedBy.push(f.dimension)
     continue
   }
-  merged.push({ ...f, alsoFlaggedBy: [], summaries: [f.summary] })
+  merged.push({ ...f, alsoFlaggedBy: [], summaries: [f.summary], alsoClaims: [] })
 }
 if (raw.length !== merged.length) log(`${raw.length} finding(s) reported, ${merged.length} after collapsing duplicates across dimensions.`)
 
 const candidates = merged.slice(0, MAX_VERIFY_TOTAL)
-if (merged.length > candidates.length) {
-  const dropped = merged.slice(candidates.length)
-  log(`Verifying the ${candidates.length} most severe; ${dropped.length} left unverified and excluded: ${dropped.map((d) => `${d.file}:${d.line}`).join(', ')}`)
-}
+const overCap = merged.slice(candidates.length)
+if (overCap.length > 0)
+  log(`Verifying the ${candidates.length} most severe; ${overCap.length} left unverified and excluded: ${overCap.map((d) => `${d.file}:${d.line}`).join(', ')}`)
 
 phase('Refute')
 const judged = await parallel(
@@ -552,6 +653,17 @@ ${repoLine}
   Stated failure: ${f.failure}
   Severity claimed: ${f.severity}
   Raised under the ${f.dimension} dimension${f.alsoFlaggedBy.length > 0 ? `, and also by ${f.alsoFlaggedBy.join(' and ')}` : ''}
+${
+    f.alsoClaims.length > 0
+      ? `
+Other reviewers reported this same line, in these words:
+${f.alsoClaims.map((c) => `  - (${c.dimension}) ${c.summary} — ${c.failure}`).join('\n')}
+
+They were collapsed into one candidate because they name one line. Refute the
+whole of it or none: leave it standing where ANY of these claims survives, and
+say in reason which one you could not break.`
+      : ''
+}
 
 The change under review is ${diffSource}, across these files:
 ${fileList}
@@ -601,4 +713,17 @@ log(`${findings.length} of ${attempted.length} verified finding(s) survived refu
 const checks = await checksPromise
 if (friction.length > 0) log(`${friction.length} note(s) about what got in the agents' way, returned under \`friction\`.`)
 
-return { findings, checks, scope, attempted: attempted.length, reported: raw.length, friction }
+return done({
+  findings,
+  checks,
+  scope,
+  attempted: attempted.length,
+  reported: raw.length,
+  // The three ways this run covered less than it looks like it did. Logged as
+  // they happened and returned here as well, because a log line is not on the
+  // return and a caller reading `findings: []` off a run whose every reviewer
+  // died has no way to tell it from a clean one.
+  unreviewed: missing.map((t) => ({ area: t.area, dimension: t.dim.key, label: t.label })),
+  overCap,
+  unjudged: unjudged.map((f) => ({ file: f.file, line: f.line, summary: f.summary, severity: f.severity })),
+})
