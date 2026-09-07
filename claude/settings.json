@@ -5,7 +5,9 @@
   },
   "permissions": {
     "defaultMode": "auto",
-    "additionalDirectories": ["/home/musaffa/.dotfiles"]
+    "additionalDirectories": [
+      "~/.dotfiles/workflows"
+    ]
   },
   "model": "opus[1m]",
   "enableArtifact": false,
@@ -21,6 +23,6 @@
   "outputStyle": "Concise",
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
-  "preferredNotifChannel": "terminal_bell",
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "preferredNotifChannel": "terminal_bell"
 }

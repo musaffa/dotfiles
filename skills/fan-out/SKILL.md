@@ -114,9 +114,11 @@ once it has seen the file.
 The path is checked after symlinks are resolved, and the resolved path has to
 sit somewhere the session may read: inside `~/.claude` itself, or in a
 directory added to `permissions.additionalDirectories` (or by `/add-dir`).
-Where `~/.claude/workflows` is a symlink into a dotfiles repository, that
-repository is the directory that has to be added — otherwise the run is
-refused before it starts, at both the link and the target.
+Where `~/.claude/workflows` is a symlink into a dotfiles repository, the
+directory it points at is what has to be added — otherwise the run is refused
+before it starts, at both the link and the target. That entry takes `~` and
+expands it; it does not take `$HOME`, which stays a literal and so grants
+nothing, silently and with no error to read.
 
 Defaults to the uncommitted working tree. `depth: 'deep'` raises the refuting
 votes per finding from one to three.
