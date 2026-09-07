@@ -7,10 +7,7 @@ description: Use when a change is big enough to want more than one agent on it �
 
 The roster is `~/.claude/agents/`, one file per agent, with one workflow beside
 it in `~/.claude/workflows/`. Both are shared by every project on this machine
-and name no fact about any of them: what a project is written in, what its
-tests run through, and what its tree divides into are the project's to state.
-This skill says when to reach for the roster, what each agent is for, and what
-a project owes it.
+and state no fact about any of them.
 
 Invoking this skill is the authorisation to call the `Workflow` tool. Nothing
 else here is.
@@ -18,10 +15,9 @@ else here is.
 ## The roster
 
 Each agent's model, effort and tool access live in its own frontmatter, which
-is authoritative. Never pass `model:` at a call site — not to the `Agent` tool,
-not to `agent()` in a workflow script. A model named in two places is a model
-that will disagree with itself later. The table here is documentation, and goes
-stale the moment the frontmatter changes; the frontmatter is what runs.
+is authoritative. **Never pass `model:` at a call site** — not to `Agent`, not
+to `agent()` in a script — a model named in two places disagrees with itself
+later. The table is documentation and goes stale; the frontmatter is what runs.
 
 | Agent | Model | For |
 |---|---|---|
@@ -33,59 +29,43 @@ stale the moment the frontmatter changes; the frontmatter is what runs.
 
 ## What the project has to state
 
-Five facts, stated once in the map doc `AGENTS.md` § Documentation indexes.
-They go there rather than into `AGENTS.md` itself because `scout` is the only
-agent that reads them and `scout` reads that doc in full already — the map and
-the facts are one read, and `AGENTS.md` stays the size it is. What `AGENTS.md`
-carries is the index entry, which is the part a subagent has to inherit rather
-than fetch, and which therefore says the facts are in there.
+Seven facts, stated once in the map doc `AGENTS.md` § Documentation indexes.
+Keep them a table of short rows — `scout` reads that doc in full on every
+dispatch, and its size is what keeps the read cheap.
 
 | Fact | What asks for it |
 |---|---|
-| The unit the tree divides into, and where those units live | The whole division of labour below. A tree that divides into none says so, and the fan-out goes by dimension alone |
-| Where a unit's tests sit | `scout`, pairing a change with the tests that cover it |
-| Which file kinds the project counts as code | The review workflow, deciding whether the code dimensions have anything to read |
-| The command that reports style without rewriting it | `verify`. The mode matters: a fix the linter applies is an edit `verify` is not allowed to make |
-| The runner a suite-width scope takes, the runner a narrower one takes, and the whole command that runs every test there is | `verify`, and the workflow, which pairs each scope with one by the scope's width |
+| The unit the tree divides into, and where those units live | The division of labour below. A tree that divides into none says so |
+| Where a unit's tests sit | `scout` |
+| Which file kinds the project counts as code | The review workflow |
+| The command that reports style without rewriting it | `verify`, and `implement`, which lints what it wrote. The mode matters: a fix the linter applies is an edit neither may make |
+| The runner a suite-width scope takes | `verify`, and the workflow, which pairs each scope with a runner by its width |
+| The runner a narrower scope takes | The same pairing, at the other width |
+| The whole command that runs every test there is | `verify`, where the change reaches past the files it edits |
 
-There is no row for the map itself: the facts are stated in it, so naming it
-twice would be one more thing to keep in step. A missing row is not a crash. It
-is a Haiku agent at `effort: low` guessing at it, and the guess reaches the
-caller looking like an answer. State them.
-
-A map doc carrying commands as well as paths is a doc whose size can run away,
-and its size is what makes `scout`'s read cheap. Keep the facts a table of
-short rows.
+State every row. A missing one is guessed at by a Haiku agent at `effort: low`,
+and the guess comes back looking like an answer.
 
 ## When it is worth it
 
-A unit that is genuinely self-contained — its own boundary, its own tests — is
-what makes any of this worth doing: one agent per unit is a real division of
-labour rather than several agents reading the same files. Where a tree has no
-such unit, the division is by dimension instead: four agents over one change
-rather than four per unit, which is still a fan-out and still worth it on a
-change large enough to want one.
+**Reviewing a written change** — the workflow below.
 
-**Reviewing a written change** — the workflow below. It scopes itself to the
-units the diff touches, so it costs what the change costs.
-
-**Planning something structural** — one `plan-change` agent. A refactor, a
-schema change, a new resource, anything crossing a unit boundary. One agent,
-not several: a plan is one argument, and three plans is a thing the caller now
-has to referee. It dispatches `scout` itself rather than reading the tree with
-Opus tokens, so one planner bills as one Opus agent plus some Haiku ones whose
-reports never reach you.
+**Planning something structural** — one `plan-change` agent: a refactor, a
+schema change, a new part of the tree, anything crossing a unit boundary. One
+agent, not several: three plans is something you then have to referee.
 
 **Implementing a chosen plan that spans units** — one `implement` agent per
 unit, dispatched together, once the plan is pinned. They must not touch the
-same files: where the plan has them sharing one, that part is one agent's job
-first and the rest wait. How to dispatch them is
-[below](#why-there-is-no-plan-or-implement-workflow).
+same files or they collide in one; where the plan has them sharing one, that
+part is one agent's job first and the rest wait. How to dispatch them is below.
 
-**Not worth it** for a change inside one resource, a question about how
-something works, or anything where dispatching costs more than reading the file
-would. `scout` and `verify` are cheap enough to call speculatively; the Opus
-agents are not.
+**Not worth it** for a change small enough to hold in one read, a question
+about how something works, or anything where dispatching costs more than
+opening the file would. `scout` and `verify` are cheap enough to call
+speculatively; the Opus agents are not.
+
+Where the tree divides into no unit, divide by dimension instead: four agents
+over the whole change rather than four per unit.
 
 ## The review workflow
 
@@ -95,59 +75,47 @@ Workflow({ scriptPath: '~/.claude/workflows/review-change.js', args: { repo: '�
 Workflow({ scriptPath: '~/.claude/workflows/review-change.js', args: { repo: '…', target: 'master..HEAD' } })
 ```
 
-**Pass `repo` whenever more than one repository is in reach**, which is any
-session holding an additional working directory. A dispatched agent does not
-reliably inherit the directory it was dispatched from — checked, not assumed: a
-`scout` dispatched from the primary directory and asked to resolve its own
-repository root resolved the additional one instead, and went on to read that
-project's facts out of that project's `AGENTS.md`. Unnamed, the run reads the
-wrong project's unit, lints it with the wrong linter and tests it with the
-wrong runner, and every one of those reports cleanly. Leave `repo` out only
-where the session has one repository in it.
-
-Pass the path, not `{ name: 'review-change' }` — the name registry holds the
-built-in workflows, and a script of your own is reached by the path it sits at.
-Expand `~` to the home directory the tool is running under. A script in that
-directory is also listed as a skill of its own name, which a session picks up
-once it has seen the file.
-
-The path is checked after symlinks are resolved, and the resolved path has to
-sit somewhere the session may read: inside `~/.claude` itself, or in a
-directory added to `permissions.additionalDirectories` (or by `/add-dir`).
-Where `~/.claude/workflows` is a symlink into a dotfiles repository, the
-directory it points at is what has to be added — otherwise the run is refused
-before it starts, at both the link and the target. That entry takes `~` and
-expands it; it does not take `$HOME`, which stays a literal and so grants
-nothing, silently and with no error to read.
+- **Pass `repo` whenever more than one repository is in reach.** A dispatched
+  agent resolves its own root; unnamed, the run lints and tests the wrong
+  project and reports it clean. Leave it out only in a single-repository
+  session
+- **Pass the path, not `{ name: 'review-change' }`** — the name registry holds
+  only the built-in workflows. Expand `~` yourself
+- **Invoke it through `Workflow`, never by a name.** A skill or a slash command
+  passes its arguments as one string, so `repo`, `target` and `depth` all read
+  `undefined`. The script stops where arguments were typed, not where none were
+- The resolved path must sit inside `~/.claude` or under a
+  `permissions.additionalDirectories` entry. Where `~/.claude/workflows` is a
+  symlink, add the directory it points at. That entry takes `~`, not `$HOME`,
+which stays a literal and grants nothing with no error to read
 
 Defaults to the uncommitted working tree. `depth: 'deep'` raises the refuting
-votes per finding from one to three.
+votes per finding from one to three; any other value is a `normal` run and says
+so as it starts.
 
-It runs `scout` once, to read the project's facts and scope the diff, then
-reviews it: `correctness`, `tests` and `design` once per unit touched, and
-`conventions` once over the whole change — that last one judges the scaffolding
-templates and the docs, which belong to the change rather than to any one unit,
-so fanning it out per unit would buy several agents reading the same two
-places. Where no code changed at all, only `conventions` runs and the workflow
-says so.
+It runs `scout` once to read the project's facts and scope the diff, then
+reviews: `correctness`, `tests` and `design` once per unit touched, and
+`conventions` once over the whole change. Where no code changed, only
+`conventions` runs and the checks agent runs the linter alone, with
+`testsResult` reporting `not-run` — unless the scout named a test scope, which
+still runs. A change with no code in it never escalates, whatever its
+`boundaryReach`: that would buy the widest test run there is for the cheapest
+change there is.
 
-Reviews finish before any verification starts. That barrier is the point: every
-finding is deduped across dimensions first, so one defect that two reviewers
-found under different names costs one refutation instead of two, and only the
-twenty most severe survivors are verified. `verify` runs alongside the whole
-review rather than gating it, so a whole-tree test run overlaps instead of
-queueing. The test scopes it is handed are targets and widths: the script pairs
-each with the runner the project named for that width, so the pairing is code
-rather than one Haiku agent checking another's at the same effort.
+Reviews finish before verification starts. Findings are deduped across
+dimensions first — one defect two reviewers found under different names costs
+one refutation, not two — and the twenty most severe candidates are verified.
+`verify` runs alongside the review rather than gating it. Test scopes come back
+as targets and widths; the script pairs each with the runner the project named
+for that width.
 
-What comes back is already deduped and severity-ordered, with `alsoFlaggedBy`
-naming the other dimensions that found the same thing. There is no summarising
-agent — the ordering is plain code, and the prose is yours to write.
+What comes back is deduped and severity-ordered, with `alsoFlaggedBy` naming
+the other dimensions that found the same thing. There is no summarising agent;
+the prose is yours to write.
 
 ### What it costs
 
-Reviews are fixed by the scope; verification is capped globally, so the ceiling
-is predictable rather than a product. For a change touching `n` units:
+For a change touching `n` units:
 
 - **reviews** — `3n + 1`: three dimensions per unit, plus `conventions` once
   over the whole change. Where no code changed, just the one. Where the tree
@@ -162,90 +130,123 @@ is predictable rather than a product. For a change touching `n` units:
 | 2 | ≤ 29 | ≤ 69 |
 | 4 | ≤ 35 | ≤ 75 |
 
-Those are ceilings — verification only reaches the cap if the reviewers find
-twenty-plus distinct defects. Concurrency is capped at `min(16, cores - 2)`, so
-a `deep` run on a wide change is a long wall clock as much as a large bill.
+Ceilings, not costs, and they do not run at once: the runtime caps concurrency
+against the cores of the machine the run is on. Read the formula off the
+`Workflow` tool description.
 
-Three things it will not tell you unless you look. `boundaryReach` decides
-whether the honest test scope is the whole tree, and it is decided by a Haiku
-agent at `effort: low` — which is why it answers in three states rather than
-two. `crosses` and `unknown` both buy a run of every test there is, so the
-narrow scope is not where a guess lands, and `boundaryReason` beside it says
-what decided which. `testsResult` names one of four outcomes rather than clean
-or not, because a run cut off partway and a run that matched no tests are
-neither passes nor failures, and the empty one is what a boolean used to report
-as a pass — `testCount` is the count that tells them apart. And the workflow
-logs every finding it dropped at the cap, by `file:line`; a run that logs no
-drops verified everything it found.
+A finding is dropped when at least half its verifiers refuted it. At `normal`
+one verifier decides either way; at `deep` one refuter out of three leaves the
+finding standing. Each survivor carries its vote count and its refuter count.
 
-## Why there is no plan or implement workflow
+The three at `deep` are not the same question asked three times. Each is given
+one lens — whether the failure can be constructed at all, whether something
+upstream already guards it, whether the finding is resting on a misreading of
+the line — and refutes on that alone, so the extra two votes buy coverage
+rather than agreement. The one verifier at `normal` is given all three, having
+no second reading to fall back on. The lens is in the label.
 
-Both need you in the middle, and a workflow script cannot put you there.
+A dead run is resumable. The tool result carries a `runId`; relaunch with
+`Workflow({ scriptPath, args, resumeFromRunId })`. This session only, the args
+must match, and a run still going must be stopped first. A `deep` run cut off
+in the refute stage then costs its tail rather than its whole self.
 
-A plan is worth having because you choose between its alternatives — so it ends
-by returning them, and the next step is a decision, not a stage. Wiring
-`plan-change` into a script that fed its output straight to `implement` would
-make that choice for you and only tell you afterwards, which is the thing
-`AGENTS.md` forbids.
+It logs, as they happen, the things that make a quiet return misleading: a
+review agent that died, so a dimension went unread rather than finding nothing;
+a candidate whose verifiers all died, so it is neither confirmed nor refuted;
+every finding cut at the cap, by `file:line`; and the linter and test result the
+moment the checks agent lands, which is usually well before the refuters finish.
 
-Implementing is scriptable in principle, but only once a plan is pinned, and
-pinning it is the decision above. Dispatch the `implement` agents yourself with
-the `Agent` tool, one per unit, in a single message so they run concurrently.
-If two of them could touch the same file, pass `isolation: "worktree"` so each
-works on its own copy of the repo — the shared part is still one agent's job
-first, but the isolation means a mistake about that costs a conflict you can
-see rather than a file two agents interleaved.
+Two things it will not tell you unless you look:
 
-A worktree isolates files and nothing else. A test runner claims what it needs
-by fixed name — worker databases, a browser debugging port, a build directory —
-so concurrent agents take the same things whatever their working directory:
-tell each `implement` agent whether it is the only one running, and where it is
-not, let it report the command and leave the tests to `verify` afterwards.
-Dispatching one agent alone is the case where it can run its own.
+- `boundaryReach` is one of three states, decided by a Haiku agent at `effort:
+  low`. On a change with code in it, `crosses` and `unknown` both run every
+  test there is, so a guess never lands on the narrow scope; `boundaryReason`
+  says what decided it
+- `testsResult` names one of five outcomes rather than clean or not, and
+  `testCount` is what separates a run that matched nothing from one that passed
+  — the log line gives both, the rest of the checks are on the return
+
+## Dispatching plan and implement yourself
+
+There is no workflow for either. Both need a decision from you in the middle,
+and a script cannot put you there.
+
+Dispatch the `implement` agents with the `Agent` tool, one per unit, in a
+single message so they run concurrently. Where two could touch the same file,
+pass `isolation: "worktree"`.
+
+```
+Agent({
+  subagent_type: 'implement',
+  description: 'Implement <unit>',
+  prompt: `<the pinned plan, pasted in full — its steps, the shapes it chose,
+and what it deliberately left alone>
+
+Your part is <unit>, at <path>. Do the steps under it and nothing outside it;
+<other unit> is another agent's, running now.
+
+Work in the repository at <absolute path>.
+
+You are one of <n> agents running concurrently: do not run the tests. Name the
+command you would have run and leave the suite to `verify`.`,
+})
+```
+
+- **Paste the plan, do not summarise it.** The agent cannot see the
+  conversation it was decided in, and a prompt that refers to the plan hands it
+  a decision to reconstruct, which its body forbids
+- **Name the repository** whenever more than one is in reach — the same silent
+  failure as `repo` above
+- **Say whether the agent is alone.** A worktree isolates files and nothing
+  else: a test runner claims worker databases, ports and build directories by
+  fixed name. Dispatching one agent alone inverts the last line of the template
+  — tell it so, and it runs its own tests
 
 ## What the agents cannot see
 
-A subagent gets `AGENTS.md`, because `CLAUDE.md` imports it — checked, not
-assumed: a `scout` agent asked to quote `## Deployment state` and "committing
-is the caller's decision" quoted both without opening a file. So do not restate
-an `AGENTS.md` rule in an agent body. It is already there, and a second copy is
-one more place to forget when the rule changes.
+A subagent gets `AGENTS.md`, because `CLAUDE.md` imports it. Do not restate an
+`AGENTS.md` rule in an agent body: a second copy is one more place to forget
+when the rule changes. The same holds one layer down — a dispatched agent gets
+its own body and its own schema descriptions, so a prompt that says either
+again is a third copy, paid on every dispatch. A prompt says only what the
+caller knows and the agent cannot.
 
-What a subagent does **not** get is `docs/`, which is read on demand rather
-than pre-loaded. So every body is a pointer rather than a copy, because a model
-given one will follow it: `review-design` is told to read the project's stated
-conventions and judge the change against the whole of them, `implement` to read
-the parts bearing on what it is writing and look for what differs between
-development and production, `scout` to read the map `AGENTS.md` points it at.
-None of them carries a command or a runner: those are the project's to state,
-and `AGENTS.md` is what carries every pointer that reaches them.
+It does not get `docs/`, this conversation, or any skill unless `Skill` is in
+its own `tools` list. `plan-change`, `implement` and `review-design` have it,
+for `testing`, `comments`, `design-principles` and any scaffolding skill the
+project ships; `scout` and `verify` do not.
 
-`scout`'s pointer is why a project owes it a map doc of its own. It reads that
-doc in full whenever a question turns on where something lives, which only
-prices well while the doc is the map and nothing else — a thousand tokens, not
-sixteen. Reaching the same fifty lines inside a general tooling doc costs the
-whole file on every dispatch, and stating the map in the body instead costs it
-whether the map is wanted or not, and leaves the one body in the roster that
-would only ever work in one repository. The size is the load-bearing part, so a
-map doc should say so in its own opening.
+So every body is a pointer rather than a copy. No body names a file under
+`docs/`, which would only ever work in one repository; each reaches one by a
+handle resolved out of the `AGENTS.md` § Documentation entry it is sent to, so
+the handle has to be a word that entry uses. `test/roster-pointers.test.mjs`
+holds every pointer the roster depends on, to the shape it depends on.
 
-The rest of every body is the agent's own role, which exists nowhere else —
-what it may not do, what counts as a finding, where it stops and hands back.
-That part does not shrink with a stronger model: Opus knows how to review, and
-what it needs from us is this project's bar, not the method.
+## What the run tells you about itself
 
-It does not get this conversation either, and it does not get a skill unless
-`Skill` is in its own `tools` list. `plan-change`, `implement` and
-`review-design` have it, so they can read `testing`, `comments`,
-`design-principles` and whatever scaffolding skill the project ships; `scout`
-and `verify` do not, because neither judges anything.
+Every body in the roster ends by reporting **friction**: what got in the way of
+answering, and what would remove it. The workflow carries a `friction` field on
+the scope, review and checks schemas and returns them collapsed under
+`friction`, each entry naming what it is `about`, `where`, the `note` itself,
+whether it `affectedAnswer`, and the `sources` that raised it. `where`
+identifies a duplicate the way `file:line` identifies a finding. The refuters
+carry no such field; there can be up to sixty of them.
 
-So when a rule in `AGENTS.md` changes, the agent bodies need no edit, and when
-a doc is renamed, only the `AGENTS.md` index it is reached through does — no
-body names a file under `docs/` at all. Three things can still rot: a map doc
-growing past the size that made `scout`'s read cheap, an `AGENTS.md` section
-renamed under the bodies pointing at it, which `grep -rn '§' ~/.claude/agents/`
-finds, and a project whose stated facts stop matching its own tree.
+- **A note that made an answer worse is said when it arrives.** The workflow
+  logs those as they come back rather than holding them for the return — it is
+  the reason to distrust the run before you act on it. Do the same yourself;
+  everything else waits
+- **The rest go at the end of the session, in one block** — deduped against
+  each other and against what you hit yourself. Yours belongs in it: a prompt
+  you had to send twice, a phase that idled behind a barrier, an agent whose
+  answer you threw away
+- **It proposes; it never applies.** A note about a doc is a change to a doc
+  and a note about the roster is a change to the roster. Both are the caller's,
+  and the roster is shared — the next project inherits your fix unasked
+- **A note names a file and what would change in it.** Anything else is a
+  complaint
+- A session with nothing to report says nothing. An empty block every time is
+  how the block stops being read
 
 ## What comes back is yours to act on
 
@@ -253,6 +254,7 @@ An agent's report goes to you, not to the caller. Relay what matters — a
 findings table, a plan's alternatives, a test failure with its output — rather
 than the transcript.
 
-Nothing in the roster commits, and nothing in it applies a refactor. Both are
-the caller's decision, so a finished fan-out ends with you saying what is
-uncommitted and what was proposed but not done.
+Nothing in the roster commits, and nothing in it applies a refactor — both are
+the caller's decision. A finished fan-out ends with you saying what is
+uncommitted, what was proposed but not done, and what the run said about
+itself.
