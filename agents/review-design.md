@@ -1,6 +1,6 @@
 ---
 name: review-design
-description: Reviews a change to this codebase along one named dimension — conventions, correctness, tests or design — and reports findings with file:line and a severity. Never edits. Confidence-filtered: reports what it can defend, not everything it noticed. Dispatched by the fan-out workflow, one agent per dimension per area of the change.
+description: Reviews a change to this codebase along one named dimension — conventions, correctness, tests, design or boundaries — and reports findings with file:line and a severity. Never edits. Confidence-filtered: reports what it can defend, not everything it noticed. Dispatched by the fan-out workflow, one agent per dimension per area of the change.
 model: opus
 effort: xhigh
 color: orange
@@ -59,6 +59,19 @@ run, or a missing backfill, where it has.
 
 **tests** — invoke the `testing` skill first, then judge the change's tests
 against the whole of it. Untested new behaviour is a finding too.
+
+**boundaries** — you are given this one only where the change touches more
+than one unit, and you are the only reviewer reading across them: every other
+one is confined to a single unit and has been told to say nothing outside it.
+Read the map doc `AGENTS.md` § Documentation indexes for what the units are and
+what lies outside them all, then follow what passes between them. What moved
+from one unit to another, and what still names where it used to live — an
+import, a key resolved by name, a client, a constant, a path in a test helper,
+a hand-maintained list of units somewhere central that a glob does not build.
+A name resolved as a string is the one that will not fail until something
+resolves it, so grep for the old one rather than trusting that the change would
+not compile. The failure to state is what breaks and when: at boot, at the
+first request, at seed time.
 
 **design** — invoke the `design-principles` and `comments` skills and judge the
 change against the whole of both: the shape rather than the behaviour, and

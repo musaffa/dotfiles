@@ -34,7 +34,7 @@ later. The table is documentation and goes stale; the frontmatter is what runs.
 
 ## What the project has to state
 
-Seven facts, stated once in the map doc `AGENTS.md` § Documentation indexes.
+Eight facts, stated once in the map doc `AGENTS.md` § Documentation indexes.
 Keep them a table of short rows — `scout` reads that doc in full on every
 dispatch, and its size is what keeps the read cheap.
 
@@ -47,6 +47,7 @@ dispatch, and its size is what keeps the read cheap.
 | The runner a suite-width scope takes | `verify`, and the workflow, which pairs each scope with a runner by its width |
 | The runner a narrower scope takes | The same pairing, at the other width |
 | The whole command that runs every test there is | `verify`, where the change reaches past the files it edits |
+| Any check the project makes that is neither the linter nor a test run, and whether it is safe to run unasked | The review workflow, which runs the safe ones after the suite and names the rest as checks it did not make. A project whose suite cannot catch something says so here or the run reports green over it |
 
 State every row. A missing one is guessed at by a Haiku agent at `effort: low`,
 and the guess comes back looking like an answer.
@@ -89,27 +90,41 @@ Workflow({ scriptPath: '~/.claude/workflows/review-change.js', args: { repo: '�
 - **Invoke it through `Workflow`, never by a name.** A skill or a slash command
   passes its arguments as one string, so `repo`, `target` and `depth` all read
   `undefined`. The script stops where arguments were typed, not where none were
+- **Nothing has to be staged, and there is no flag saying whether it is.** The
+  run reads the whole uncommitted change — staged, unstaged and untracked
+  alike — by building a throwaway index in `/tmp` and diffing that against
+  `HEAD`, which is what pairs each moved file with where it came from and what
+  sees a file git is not tracking at all. The caller's own index is not
+  touched, and nothing in the repository is written or reset. A `staged: true`
+  left over from before is ignored and the run says so
 - The resolved path must sit inside `~/.claude` or under a
   `permissions.additionalDirectories` entry. Where `~/.claude/workflows` is a
   symlink, add the directory it points at. That entry takes `~`, not `$HOME`,
 which stays a literal and grants nothing with no error to read
 
-Defaults to the uncommitted working tree. `depth: 'deep'` raises the refuting
-votes per finding from one to three; any other value is a `normal` run and says
-so as it starts.
+Defaults to the whole uncommitted change; `target` reads a commit range
+instead, and is the only thing that changes what is read. `depth: 'deep'`
+raises the refuting votes per finding from one to three; any other value is a
+`normal` run and says so as it starts.
 
 It runs `scout` once to read the project's facts and scope the diff, then
-reviews: `correctness`, `tests` and `design` once per unit touched, and
-`conventions` once over the whole change. Where no code changed, only
+reviews: `correctness`, `tests` and `design` once per unit touched,
+`conventions` once over the whole change, and `boundaries` once over the whole
+change as well where more than one unit was touched — each per-unit reviewer is
+told to stay inside its unit, so what passes between them is otherwise nobody's,
+and a change that moves code from one unit to another is made almost entirely of
+that. Where no code changed, only
 `conventions` runs and the checks agent runs the linter alone, with
 `testsResult` reporting `not-run` — unless the scout named a test scope, which
 still runs. A change with no code in it never escalates, whatever its
 `boundaryReach`: that would buy the widest test run there is for the cheapest
 change there is.
 
-Reviews finish before verification starts. Findings are deduped across
-dimensions first — one defect two reviewers found under different names costs
-one refutation, not two — and the twenty most severe candidates are verified.
+Reviews finish before verification starts. Findings are deduped twice first —
+one defect two reviewers found on one line under different names costs one
+refutation rather than two, and one claim made about many files costs one
+refutation rather than one per file, carrying the other locations as
+`instances` — and the twenty most severe candidates are verified.
 `verify` runs alongside the review rather than gating it. Test scopes come back
 as targets and widths; the script pairs each with the runner the project named
 for that width.
@@ -122,8 +137,10 @@ the prose is yours to write.
 
 For a change touching `n` units:
 
-- **reviews** — `3n + 1`: three dimensions per unit, plus `conventions` once
-  over the whole change. Where no code changed, just the one. Where the tree
+- **reviews** — `3n + 1`, and `3n + 2` where `n` is more than one: three
+  dimensions per unit, plus `conventions` once over the whole change, plus
+  `boundaries` once over it where there is more than one unit to have a
+  boundary between. Where no code changed, just the one. Where the tree
   divides into no unit, the three read the whole change and `n` is 1
 - **verifiers** — at most 20 at `normal`, 60 at `deep`, whatever `n` is
 - **fixed** — two, the scout and the checks agent
@@ -132,8 +149,8 @@ For a change touching `n` units:
 |---|---|---|
 | none (no code changed) | ≤ 23 | ≤ 63 |
 | 1, or a tree with no unit division | ≤ 26 | ≤ 66 |
-| 2 | ≤ 29 | ≤ 69 |
-| 4 | ≤ 35 | ≤ 75 |
+| 2 | ≤ 30 | ≤ 70 |
+| 4 | ≤ 36 | ≤ 76 |
 
 The rows count agents rather than what they cost, and the two no longer
 track each other. Most of every row is verifiers, and a verifier is a
@@ -151,11 +168,19 @@ where a verifier died. Each survivor carries its vote count and its refuter
 count.
 
 The three at `deep` are not the same question asked three times. Each is given
-one lens — whether the failure can be constructed at all, whether something
-upstream already guards it, whether the finding is resting on a misreading of
-the line — and refutes on that alone, so the extra two votes buy coverage
-rather than agreement. The one verifier at `normal` is given all three, having
-no second reading to fall back on. The lens is in the label.
+one lens and refutes on that alone, so the extra two votes buy coverage rather
+than agreement. The one verifier at `normal` is given all three of its set,
+having no second reading to fall back on. The lens is in the label.
+
+Which set depends on what the finding claims. `correctness` and `boundaries`
+name a failure, and are refuted by going after the failure: whether it can be
+constructed at all, whether something upstream already guards it, whether it
+rests on a misreading of the line. `design`, `tests` and `conventions` name a
+judgement about code that runs, so there is no failure to construct and nothing
+upstream guarding one — two of those three would refute every such finding
+before the file was opened. They are refuted instead on whether the gap is
+already filled, whether the rule invoked governs this case, and the same
+misreading lens.
 
 A dead run is resumable. The tool result carries a `runId`; relaunch with
 `Workflow({ scriptPath, args, resumeFromRunId })`. This session only, the args
@@ -184,6 +209,11 @@ Two things it will not tell you unless you look:
 - `testsResult` names one of five outcomes rather than clean or not, and
   `testCount` is what separates a run that matched nothing from one that passed
   — the log line gives both, the rest of the checks are on the return
+- `checksNotMade` is what the project checks and this run did not, because the
+  project did not say the check was safe to run unasked. A linter and a suite
+  coming back green says nothing about those, and on a project whose suite
+  cannot catch a whole class of breakage that is the difference between a green
+  that means something and one that does not
 
 ## Dispatching plan and implement yourself
 

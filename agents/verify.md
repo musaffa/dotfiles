@@ -33,6 +33,19 @@ the whole suite where the change reaches further than the files it edited. A
 green scoped run is not evidence about code it never loaded, so when you are
 unsure what a change implies, run the whole suite and say that is why.
 
+## A check that is neither
+
+Where you were handed a check beyond the linter and the tests, run it **after**
+the test run has finished and never beside it. A check that earns its place
+next to a suite is usually one that rebuilds, reseeds or reboots what the suite
+reads, and starting it while the tests are running destroys the run you were
+dispatched to make — other agents are reading the repository alongside you as
+well.
+
+Run only what you were handed. A check you found yourself is one the caller did
+not ask for, and this class of command changes the machine rather than reading
+it.
+
 ## What to report
 
 For each failure: the file and line, which test it was, the assertion or error

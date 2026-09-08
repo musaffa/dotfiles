@@ -23,6 +23,7 @@ const scopeOf = (over = {}) => ({
   linter: 'lint --check',
   runners: RUNNERS,
   testScopes: [{ target: 'tests/alpha', width: 'suite' }],
+  extraChecks: [],
   boundaryReach: 'contained',
   boundaryReason: 'touches nothing shared',
   friction: [],
@@ -37,6 +38,7 @@ const CHECKS_OK = {
   testsResult: 'passed',
   testCount: 12,
   testFailures: [],
+  extraChecks: [],
   notCovered: 'nothing',
   scopeCorrected: 'none',
   friction: [],
@@ -379,7 +381,7 @@ test('every way the run can end returns the same shape', async () => {
   // `findings: []` cannot otherwise tell a clean review from a run whose
   // reviewers all died, whose candidates were cut at the cap, or that was never
   // told which repository to read.
-  const KEYS = ['findings', 'checks', 'scope', 'attempted', 'reported', 'friction', 'repoNamed', 'unreviewed', 'overCap', 'unjudged']
+  const KEYS = ['findings', 'checks', 'checksNotMade', 'scope', 'attempted', 'reported', 'friction', 'repoNamed', 'unreviewed', 'overCap', 'unjudged']
   const typed = await run({ args: 'deep', respond: () => assert.fail('no agent should run') })
   const bare = await run({ args: '', respond: () => assert.fail('no agent should run') })
   const dead = await run({ args: {}, respond: byPhase({ Scope: null }) })
@@ -604,4 +606,188 @@ test('a dispatched agent is not told again what its own body already says', asyn
   for (const c of calls) {
     for (const phrase of restated) assert.ok(!c.prompt.includes(phrase), `${c.phase} prompt restates "${phrase}"`)
   }
+})
+
+test('a finding is refuted on lenses its own dimension can be refuted on', async () => {
+  // `reproduce` and `guard` both go after a runtime failure. A design or a
+  // conventions finding names none, so handing it those two is two refuters out
+  // of three before anyone has opened the file — at `deep` the dimensions whose
+  // whole job is judgement would never survive their own verification.
+  const deepOn = async (label) => {
+    const { calls } = await run({
+      args: { depth: 'deep' },
+      respond: stub({ scope: scopeOf(), review: (c) => (c.label === label ? { findings: [finding()], friction: [] } : noFindings) }),
+    })
+    return labelsIn(calls, 'Refute').map((l) => l.split('/').pop())
+  }
+
+  assert.deepEqual(await deepOn('review:alpha/correctness'), ['reproduce', 'guard', 'misreading'])
+  assert.deepEqual(await deepOn('review:alpha/design'), ['covered', 'applies', 'misreading'])
+  assert.deepEqual(await deepOn('review:alpha/tests'), ['covered', 'applies', 'misreading'])
+  assert.deepEqual(await deepOn('review:all/conventions'), ['covered', 'applies', 'misreading'])
+
+  // And the one verifier at `normal` gets all three of its own set, not of both.
+  const { calls } = await run({
+    args: {},
+    respond: stub({ scope: scopeOf(), review: (c) => (c.label === 'review:alpha/design' ? { findings: [finding()], friction: [] } : noFindings) }),
+  })
+  const only = promptFor(calls, 'Refute')
+  assert.ok(only.includes('A gap already filled is refuted'), 'the judgement lenses')
+  assert.ok(!only.includes('Construct the input'), 'and not the failure ones')
+})
+
+test('the working tree is read whole, without the caller having to say how', async () => {
+  // An untracked directory collapses to one line under plain `--porcelain`, and
+  // git has no diff for a file it is not tracking: a change that moves a tree
+  // reads as a pile of deletions and nothing else, which is not a shape that
+  // looks wrong. A throwaway index sees all three states at once, so nobody has
+  // to declare which one the change is sitting in.
+  const { calls, logs } = await run({
+    args: {},
+    respond: stub({ scope: scopeOf(), review: (c) => (c.label === 'review:alpha/correctness' ? { findings: [finding()], friction: [] } : noFindings) }),
+  })
+
+  for (const phase of ['Scope', 'Review', 'Refute']) {
+    const prompt = promptFor(calls, phase)
+    assert.ok(prompt.includes('GIT_INDEX_FILE=$(mktemp -u)'), `${phase} reads through a temporary index`)
+    assert.ok(prompt.includes('git add -A'), `${phase} pairs a file that moved with where it came from`)
+  }
+  assert.ok(logged(logs, /temporary index/))
+  assert.ok(!promptFor(calls, 'Scope').includes('open any file listed'), 'no untracked special case is left to the reader')
+})
+
+test('a caller still passing `staged` is told it is not read rather than ignored in silence', async () => {
+  const { logs } = await run({ args: { staged: true }, respond: stub({ scope: scopeOf() }) })
+
+  assert.ok(logged(logs, /`staged` is no longer read/))
+})
+
+test('a ref range is still read as a range', async () => {
+  const { calls, logs } = await run({ args: { target: 'main..HEAD' }, respond: stub({ scope: scopeOf() }) })
+
+  assert.ok(promptFor(calls, 'Scope').includes('git diff -M main..HEAD'))
+  assert.ok(!promptFor(calls, 'Scope').includes('GIT_INDEX_FILE'), 'a committed range needs no index built for it')
+  assert.ok(!logged(logs, /temporary index/))
+})
+
+test('a file list too long to paste is capped and pointed at', async () => {
+  // The list goes into every review prompt and every refute prompt, so on a
+  // change that moves a tree it is most of forty agents' prompts.
+  const files = Array.from({ length: 200 }, (unusedValue, i) => `alpha/f${i}.rb`)
+  const { calls } = await run({
+    args: {},
+    respond: stub({ scope: scopeOf({ files }), review: (c) => (c.label === 'review:alpha/correctness' ? { findings: [finding()], friction: [] } : noFindings) }),
+  })
+
+  for (const phase of ['Review', 'Refute']) {
+    const prompt = promptFor(calls, phase)
+    assert.ok(prompt.includes('alpha/f59.rb'), `${phase} lists up to the cap`)
+    assert.ok(!prompt.includes('alpha/f60.rb'), `${phase} stops at it`)
+    assert.ok(prompt.includes('and 140 more'), `${phase} says how many it left out`)
+    assert.ok(prompt.includes('--name-status'), `${phase} says where to get them`)
+  }
+})
+
+test('a change touching more than one unit buys an agent that reads between them', async () => {
+  // Each per-unit reviewer is told to stay inside its unit, so a reference from
+  // one to another is nobody's until this one exists.
+  const two = await run({ args: {}, respond: stub({ scope: scopeOf({ units: ['alpha', 'beta'] }) }) })
+  assert.ok(labelsIn(two.calls, 'Review').includes('review:all/boundaries'))
+
+  const one = await run({ args: {}, respond: stub({ scope: scopeOf() }) })
+  assert.ok(!labelsIn(one.calls, 'Review').includes('review:all/boundaries'), 'one unit has no between')
+
+  const none = await run({ args: {}, respond: stub({ scope: scopeOf({ unitWord: '', units: [] }) }) })
+  assert.ok(!labelsIn(none.calls, 'Review').includes('review:all/boundaries'))
+
+  // A change with no code in it is a conventions run whatever it touches.
+  const docs = await run({ args: {}, respond: stub({ scope: scopeOf({ units: ['alpha', 'beta'], codeFilesChanged: false, files: ['README.md'], testScopes: [] }) }) })
+  assert.deepEqual(labelsIn(docs.calls, 'Review'), ['review:all/conventions'])
+})
+
+test('a boundaries finding is refuted like a failure, not like a judgement', async () => {
+  // A key still naming the unit it moved out of fails when something resolves
+  // it, so there is a failure to construct and a guard to look for.
+  const { calls } = await run({
+    args: { depth: 'deep' },
+    respond: stub({
+      scope: scopeOf({ units: ['alpha', 'beta'] }),
+      review: (c) => (c.label === 'review:all/boundaries' ? { findings: [finding()], friction: [] } : noFindings),
+    }),
+  })
+
+  assert.deepEqual(labelsIn(calls, 'Refute').map((l) => l.split('/').pop()), ['reproduce', 'guard', 'misreading'])
+})
+
+test('one claim repeated across files is verified once and carries every location', async () => {
+  // The shape a move produces: one missed reference, forty times, each in a file
+  // of its own. Apart, they fill the cap with copies of one question.
+  const many = Array.from({ length: 24 }, (unusedValue, i) => finding({ file: `alpha/f${i}.rb`, line: i + 1, summary: 'the container key still names the unit it moved out of' }))
+  const { result, calls, logs } = await run({
+    args: {},
+    respond: stub({ scope: scopeOf(), review: (c) => (c.label === 'review:alpha/correctness' ? { findings: many, friction: [] } : noFindings) }),
+  })
+
+  assert.equal(calls.filter((c) => c.phase === 'Refute').length, 1, '24 copies of one claim, one refutation')
+  assert.equal(result.findings.length, 1)
+  assert.equal(result.findings[0].instances.length, 23, 'and it carries the other locations')
+  assert.deepEqual(result.overCap, [], 'nothing was pushed off the end')
+  assert.ok(logged(logs, /23 finding\(s\) were the same claim about another file/))
+
+  const refute = promptFor(calls, 'Refute')
+  assert.ok(refute.includes('alpha/f23.rb:24'))
+  assert.ok(refute.includes('Your verdict decides all of them'))
+})
+
+test('two different claims in two files stay two candidates', async () => {
+  const { result, calls } = await run({
+    args: {},
+    respond: stub({
+      scope: scopeOf(),
+      review: (c) =>
+        c.label === 'review:alpha/correctness'
+          ? {
+              findings: [
+                finding({ file: 'alpha/one.rb', summary: 'the container key still names the unit it moved out of' }),
+                finding({ file: 'alpha/two.rb', summary: 'the deadline is discarded before the request is sent' }),
+              ],
+              friction: [],
+            }
+          : noFindings,
+    }),
+  })
+
+  assert.equal(calls.filter((c) => c.phase === 'Refute').length, 2)
+  assert.equal(result.findings.length, 2)
+  for (const f of result.findings) assert.deepEqual(f.instances, [])
+})
+
+test('a check the project makes that its tests do not is run last, or named as not made', async () => {
+  const seeds = { command: 'seed-check', why: 'a unit missing from the seed list seeds nothing', runUnattended: true }
+  const ran = await run({
+    args: {},
+    respond: stub({
+      scope: scopeOf({ extraChecks: [seeds] }),
+      checks: { ...CHECKS_OK, extraChecks: [{ command: 'seed-check', result: 'failed', detail: 'beta seeds no permissions' }] },
+    }),
+  })
+
+  const checks = promptFor(ran.calls, 'Checks')
+  assert.ok(checks.includes('seed-check — a unit missing from the seed list seeds nothing'))
+  assert.ok(checks.includes('only once the test run above has finished'))
+  assert.ok(logged(ran.logs, /`seed-check` failed/), 'and its result lands beside the linter and the tests')
+  assert.deepEqual(ran.result.checksNotMade, [])
+
+  const held = await run({ args: {}, respond: stub({ scope: scopeOf({ extraChecks: [{ ...seeds, runUnattended: false }] }) }) })
+  assert.ok(!promptFor(held.calls, 'Checks').includes('seed-check'), 'not this run to make')
+  assert.equal(held.result.checksNotMade.length, 1)
+  assert.ok(logged(held.logs, /not this run's to make and were not made: `seed-check`/))
+})
+
+test('a project stating no extra check says nothing about one', async () => {
+  const { calls, logs, result } = await run({ args: {}, respond: stub({ scope: scopeOf() }) })
+
+  assert.ok(!promptFor(calls, 'Checks').includes('only once the test run above has finished'))
+  assert.ok(!logged(logs, /not made/))
+  assert.deepEqual(result.checksNotMade, [])
 })

@@ -26,6 +26,7 @@ const OPTS = (args && typeof args === 'object' && args) || {}
 const done = (over = {}) => ({
   findings: [],
   checks: null,
+  checksNotMade: [],
   scope: null,
   attempted: 0,
   reported: 0,
@@ -67,6 +68,15 @@ const TARGET = OPTS.target || null
 // and then read that repository's AGENTS.md, lint it, and test it. Naming the
 // root is the caller's job because the script cannot run git to find it.
 const REPO = OPTS.repo || null
+// Whether the change was staged used to be the caller's to declare, and a
+// caller who forgot got the failure the declaration was there to prevent: `git
+// status --porcelain` collapses an untracked directory to one line whatever
+// landed inside it, and git has no diff at all for a file it is not tracking,
+// so a change that moves a tree arrived as a pile of deletions and nothing
+// about that reads as incomplete. It was never a preference — it is a fact
+// about the repository, and `WORKING_TREE` below reads it rather than asking.
+if (OPTS.staged !== undefined)
+  log('`staged` is no longer read — the whole uncommitted change is reviewed, staged or not, and moved files are paired either way.')
 const VOTES = DEPTH === 'deep' ? 3 : 1
 // A global ceiling, not a per-reviewer one: N reviewers x a per-reviewer cap x
 // VOTES is a product, and the product is what gets billed.
@@ -82,12 +92,27 @@ const PER_UNIT = [{ key: 'correctness' }, { key: 'tests' }, { key: 'design' }]
 
 const WHOLE_CHANGE = { key: 'conventions' }
 
+// Every per-unit reviewer is told to say nothing outside its own unit, which
+// leaves what passes between them nobody's job — and a change that moves code
+// from one unit to another is made almost entirely of that: a key, an import
+// or a client still naming where its target used to live. `conventions` is the
+// only other agent reading the whole change and it is judging that change
+// against what the project wrote down, not chasing a reference across a
+// boundary. So a change touching more than one unit buys one agent that reads
+// between them, and a change touching one buys none: it costs what the change
+// costs.
+const CROSS_UNIT = { key: 'boundaries' }
+
 // A finding can be wrong in more than one way, and three verifiers asked the
 // same question are three votes on one reading of it. Each lens is a different
 // way it can be wrong, so a deep run spends its extra two votes on coverage
 // rather than on repetition. One verifier gets all three, because a normal run
 // has no second reading to fall back on.
-const LENSES = [
+//
+// Which three depends on what the finding claims. These go after a runtime
+// failure — construct it, or find what already stops it — which is what a
+// `correctness` finding names and the only kind of finding they fit.
+const FAILURE_LENSES = [
   {
     key: 'reproduce',
     ask: 'Construct the input or the state the finding claims and follow it through. A failure nothing can reach is refuted however the code reads.',
@@ -102,7 +127,33 @@ const LENSES = [
   },
 ]
 
-const lensAt = (v) => LENSES[v % LENSES.length]
+// A design, conventions or tests finding names no failure: it says a reader
+// pays a cost, a rule is not followed, a case is not covered. Two of the three
+// above refute that by construction, and at three votes that is two refuters
+// before anyone has opened the file — the dimensions whose whole job is
+// judgement would never survive their own verification. These go after whether
+// the judgement lands instead.
+const JUDGEMENT_LENSES = [
+  {
+    key: 'covered',
+    ask: 'Look for the thing the finding says is absent. The test that already exercises it, the entry that already allows it, the place this codebase already does it the way the finding asks for. A gap already filled is refuted.',
+  },
+  {
+    key: 'applies',
+    ask: 'Go to where this project states the rule the finding rests on and read what it actually covers. A principle this codebase does not hold, or holds for something else, refutes the finding built on it — a principle held elsewhere is not one held here.',
+  },
+  {
+    key: 'misreading',
+    ask: 'Read the code as written rather than as the finding summarises it. A finding resting on a misreading of what the line does is refuted, whether or not the concern is real somewhere else.',
+  },
+]
+
+// A dangling reference fails when something resolves it, so `boundaries` names
+// a failure the way `correctness` does and is refuted by going after that
+// failure rather than by asking whether the rule applies.
+const FAILURE_DIMENSIONS = new Set(['correctness', 'boundaries'])
+const lensesFor = (dimension) => (FAILURE_DIMENSIONS.has(dimension) ? FAILURE_LENSES : JUDGEMENT_LENSES)
+const lensAt = (dimension, v) => lensesFor(dimension)[v % lensesFor(dimension).length]
 
 // Every agent here is forced through StructuredOutput, so anything the schema
 // has no field for is dropped where it stood: the fact the map doc did not
@@ -189,6 +240,24 @@ const SCOPE_SCHEMA = {
         required: ['target', 'width'],
       },
     },
+    extraChecks: {
+      type: 'array',
+      description:
+        'the checks that section names which are neither the linter nor a test run — a seed run, a boot, a build, a type check — and empty where it names none. Read them off the doc rather than inventing one from the tree',
+      items: {
+        type: 'object',
+        properties: {
+          command: { type: 'string' },
+          why: { type: 'string', description: 'what it catches that the tests do not' },
+          runUnattended: {
+            type: 'boolean',
+            description:
+              'true only where that section says outright that it is safe to run unasked. False where it says otherwise and false where it says nothing — a check that rebuilds a database or writes outside the repository is one the caller runs, not this run',
+          },
+        },
+        required: ['command', 'why', 'runUnattended'],
+      },
+    },
     boundaryReach: {
       type: 'string',
       enum: ['crosses', 'contained', 'unknown'],
@@ -201,7 +270,7 @@ const SCOPE_SCHEMA = {
       description: 'what decided that — the shared layer, column or contract you found, or, where unknown, what you could not work out',
     },
   },
-  required: ['unitWord', 'units', 'files', 'codeFilesChanged', 'codeKinds', 'linter', 'runners', 'testScopes', 'boundaryReach', 'boundaryReason', 'friction'],
+  required: ['unitWord', 'units', 'files', 'codeFilesChanged', 'codeKinds', 'linter', 'runners', 'testScopes', 'extraChecks', 'boundaryReach', 'boundaryReason', 'friction'],
 }
 
 const FINDINGS_SCHEMA = {
@@ -251,6 +320,19 @@ const CHECKS_SCHEMA = {
     },
     testCount: { type: 'integer', description: 'how many tests the run selected; 0 is what tells a run that matched nothing from a clean one' },
     testFailures: { type: 'array', items: { type: 'string' } },
+    extraChecks: {
+      type: 'array',
+      description: 'one entry for every check you were handed beyond the linter and the tests, and empty where you were handed none',
+      items: {
+        type: 'object',
+        properties: {
+          command: { type: 'string' },
+          result: { type: 'string', enum: ['passed', 'failed', 'not-run'] },
+          detail: { type: 'string', description: 'what failed, or why it was not run' },
+        },
+        required: ['command', 'result', 'detail'],
+      },
+    },
     notCovered: { type: 'string', description: 'what the scope you ran did not reach, or "nothing" where it reached everything' },
     scopeCorrected: { type: 'string', description: 'the command you were handed and the command you ran, where they differ; "none" where you ran what you were handed' },
     friction: FRICTION,
@@ -258,7 +340,7 @@ const CHECKS_SCHEMA = {
   // The two lists are required rather than optional: `linterClean: false` with
   // no offenses beside it, or `failed` with no failures, is a verdict the
   // caller cannot act on without running the thing again themselves.
-  required: ['linterClean', 'linterCommand', 'linterOffenses', 'testCommand', 'testsResult', 'testCount', 'testFailures', 'notCovered', 'scopeCorrected', 'friction'],
+  required: ['linterClean', 'linterCommand', 'linterOffenses', 'testCommand', 'testsResult', 'testCount', 'testFailures', 'extraChecks', 'notCovered', 'scopeCorrected', 'friction'],
 }
 
 const RANK = { high: 0, medium: 1, low: 2 }
@@ -270,12 +352,19 @@ const bySeverity = (a, b) => RANK[a.severity] - RANK[b.severity]
 // significant here, because a project's own vocabulary is exactly what a
 // finding turns on, and a trailing plural is not, so two wordings of one defect
 // land together whichever number each of them reached for.
-const words = (s) =>
+// `keepDigits` is for the merge that crosses files. There, the line number is
+// no longer holding two claims apart, and a numeral is often the only thing
+// left that does — "handler 1 drops the header" and "handler 2 drops the
+// header" are two defects whose words are otherwise identical. On one line the
+// opposite holds: two reviewers describing one defect reach for different
+// numbers for it, so the number is noise and dropping it is what lets them
+// merge.
+const words = (s, keepDigits = false) =>
   new Set(
     String(s)
       .split(/[^A-Za-z0-9]+/)
       .filter(Boolean)
-      .filter((w) => w.length > 3 || (w.length >= 2 && w === w.toUpperCase() && /[A-Z]/.test(w)))
+      .filter((w) => w.length > 3 || (keepDigits && /^\d+$/.test(w)) || (w.length >= 2 && w === w.toUpperCase() && /[A-Z]/.test(w)))
       .map((w) => w.toLowerCase().replace(/s$/, '')),
   )
 
@@ -285,9 +374,9 @@ const words = (s) =>
 // connection" — one word in common, and a common word at that — scored 0.5 and
 // merged. Two unrelated defects on one line then became one candidate, and the
 // verdict on the survivor's claim decided the other one's fate.
-function overlap(a, b) {
-  const x = words(a)
-  const y = words(b)
+function overlap(a, b, keepDigits = false) {
+  const x = words(a, keepDigits)
+  const y = words(b, keepDigits)
   // Nothing significant on either side is not evidence of sameness — except
   // where the two are the same string, which is not two findings to weigh.
   if (x.size === 0 || y.size === 0) return String(a).trim() !== '' && String(a).trim() === String(b).trim() ? 1 : 0
@@ -353,9 +442,24 @@ const repoLine = REPO
   ? `\nWork in the repository at \`${REPO}\`. Change to it first, read every path relative to it, and run every command from it — another repository is in reach and is not the one under review.\n`
   : ''
 
+// A throwaway index in /tmp. `git add -A` against it pairs every moved file
+// with where it came from — the whole reason staging was ever asked for — and
+// sees a file git is not tracking, while `GIT_INDEX_FILE` keeps all of it out
+// of the caller's own index: nothing in the repository is written, staged or
+// reset. One read then covers what took three, because staged, unstaged and
+// untracked are all differences between HEAD and the working tree, and this
+// asks for exactly that.
+const WORKING_TREE = (git) => `GIT_INDEX_FILE=$(mktemp -u) sh -c 'git read-tree HEAD && git add -A && ${git}; rm -f "$GIT_INDEX_FILE"'`
+
 const diffSource = TARGET
-  ? `the change in \`${TARGET}\` (use \`git diff ${TARGET}\`)`
-  : 'the uncommitted change in the working tree (use `git status --porcelain` and `git diff`)'
+  ? `the change in \`${TARGET}\` (use \`git diff -M ${TARGET}\`)`
+  : `the whole uncommitted change — staged, unstaged and untracked alike (read it with \`${WORKING_TREE('git diff --cached -M HEAD')}\`, which pairs a file that moved with where it moved from and writes nothing but a temporary index under /tmp)`
+// The same source as a bare command, for an agent told to go and get the rest
+// of a list too long to paste.
+const fileListCommand = TARGET ? `git diff --name-status -M ${TARGET}` : WORKING_TREE('git diff --cached -M --name-status HEAD')
+
+if (!TARGET)
+  log('Reviewing the whole uncommitted change through a temporary index, so an untracked file is seen and a moved file is paired with where it came from. The repository and the caller\'s own index are left as they are.')
 
 if (!REPO)
   log(
@@ -450,7 +554,14 @@ if (!scope.codeFilesChanged && codeInDiff.length > 0) {
 if (scope.codeFilesChanged && codeKinds.length === 0)
   log('The scout named no code kinds, so nothing checked `codeFilesChanged` against the diff. It is one agent\'s word either way.')
 
-const fileList = scope.files.join('\n')
+// Pasted into every review prompt and every refute prompt, so a diff that
+// moves a tree would spend most of forty agents' prompts on a list none of
+// them reads to the end. Past the cap they are told where to get the rest.
+const MAX_FILES_LISTED = 60
+const fileList =
+  scope.files.length > MAX_FILES_LISTED
+    ? `${scope.files.slice(0, MAX_FILES_LISTED).join('\n')}\n… and ${scope.files.length - MAX_FILES_LISTED} more — run \`${fileListCommand}\` for the whole list`
+    : scope.files.join('\n')
 const unitWord = scope.unitWord || 'area'
 const units = scope.units || []
 log(`${scope.files.length} file(s) across ${units.length || 'no'} ${unitWord}(s): ${units.join(', ') || 'none'}`)
@@ -465,6 +576,7 @@ if (scope.codeFilesChanged) {
   // code dimensions read the whole change rather than not running at all.
   const areas = units.length > 0 ? units : ['the whole change']
   for (const area of areas) for (const dim of PER_UNIT) add(area, dim)
+  if (units.length > 1) add('the whole change', CROSS_UNIT)
 } else {
   log('No code changed — running conventions over the whole change only; correctness, tests and design have nothing to read.')
 }
@@ -493,6 +605,35 @@ if (noTestsImplied) log('No code changed and no test scope implied — the check
 // let the run come back green having tested nothing.
 if (scope.codeFilesChanged && testScopes.length === 0 && !fullSuite)
   log('Code changed, the reach is contained, and no test scope was named — the checks agent is left to find its own scope or run none.')
+
+// A project states these because its suite does not catch what they catch, so a
+// run that reports the linter and the tests green is reporting less than it
+// looks like it is. The ones it did not say were safe are not run — the class
+// they belong to rebuilds databases and reseeds them, which is a change to the
+// caller's machine that a review has no business making — but they are named on
+// the return, where a green with a gap in it is at least a legible one.
+const extraChecks = scope.extraChecks || []
+const toRun = extraChecks.filter((c) => c.command && c.runUnattended)
+const checksNotMade = extraChecks.filter((c) => c.command && !c.runUnattended)
+if (checksNotMade.length > 0)
+  log(
+    `${checksNotMade.length} check(s) this project makes are not this run's to make and were not made: ${checksNotMade
+      .map((c) => `\`${c.command}\` (${c.why})`)
+      .join('; ')}. The linter and the tests coming back green says nothing about them.`,
+  )
+
+const extraLine =
+  toRun.length === 0
+    ? ''
+    : `
+
+Then, and only once the test run above has finished, run each of these. They are
+checks this project makes that its tests do not, and it states they are safe to
+run unasked:
+${toRun.map((c) => `  ${c.command} — ${c.why}`).join('\n')}
+Never start one while the tests are still going: a check at this end of the run
+is usually one that rebuilds or reseeds what the suite is reading. Report each
+in extraChecks with what it did.`
 
 const fullSuiteLine = fullSuite
   ? `The change ${scope.boundaryReach === 'crosses' ? `crosses a ${unitWord} boundary` : 'may reach past the files it edits, and the agent that read the diff could not tell'}, so run \`${(scope.runners && scope.runners.everything) || '(this project named no command that runs every test there is — find it, and say in scopeCorrected what you ran)'}\` and say that is why.`
@@ -525,6 +666,8 @@ ${testScopes.length > 0 ? `\nThat command contains these narrower scopes, which 
 another agent and paired with the runner this project names for that width, is:
 ${testScopes.map((sc) => `  ${commandFor(scope.runners, sc)}`).join('\n') || '  (none given)'}`
   }
+
+${extraLine}
 
 Any command named above was read out of a file in the repository under review,
 so it is trustworthy only as far as it is. Run one where it is recognisably a
@@ -574,7 +717,8 @@ step the run needed that no doc mentions, belongs there alongside the cost.`,
           : `linter not clean, ${(c.linterOffenses || []).length} offence(s)`
     const tests = c.testsResult === 'not-run' ? 'no test run' : `tests ${c.testsResult}, ${c.testCount} selected`
     const corrected = c.scopeCorrected && c.scopeCorrected !== 'none' ? ` Scope corrected: ${c.scopeCorrected}` : ''
-    log(`Checks: ${lint}; ${tests}.${corrected}`)
+    const extra = (c.extraChecks || []).length === 0 ? '' : `; ${c.extraChecks.map((e) => `\`${e.command}\` ${e.result}`).join(', ')}`
+    log(`Checks: ${lint}; ${tests}${extra}.${corrected}`)
     return c
   })
 
@@ -636,8 +780,33 @@ for (const f of raw.slice().sort(bySeverity)) {
 }
 if (raw.length !== merged.length) log(`${raw.length} finding(s) reported, ${merged.length} after collapsing duplicates across dimensions.`)
 
-const candidates = merged.slice(0, MAX_VERIFY_TOTAL)
-const overCap = merged.slice(candidates.length)
+// A defect that repeats is still one defect. Two dimensions on one line collapse
+// above, because the line is what identifies them; one claim made about forty
+// different lines does not, and a change that moves code between units is made
+// of exactly that — one missed reference at a time, each in a file of its own.
+// Left apart they fill the cap with copies of a single question and push
+// everything else off the end, so they are asked once and stand or fall
+// together. The threshold is well above the one that merges two wordings of one
+// defect: this merge crosses files, where the line number is no longer there to
+// hold two unrelated claims apart.
+const PATTERN_OVERLAP = 0.7
+const grouped = []
+for (const f of merged) {
+  const twin = grouped.find((g) => g.dimension === f.dimension && g.summaries.some((sum) => overlap(sum, f.summary, true) >= PATTERN_OVERLAP))
+  if (twin) {
+    twin.instances.push({ file: f.file, line: f.line, summary: f.summary })
+    twin.summaries.push(f.summary)
+    for (const d of f.alsoFlaggedBy) if (!twin.alsoFlaggedBy.includes(d)) twin.alsoFlaggedBy.push(d)
+    continue
+  }
+  grouped.push({ ...f, instances: [] })
+}
+const repeated = merged.length - grouped.length
+if (repeated > 0)
+  log(`${repeated} finding(s) were the same claim about another file and are verified once with the finding they repeat, which carries every location.`)
+
+const candidates = grouped.slice(0, MAX_VERIFY_TOTAL)
+const overCap = grouped.slice(candidates.length)
 if (overCap.length > 0)
   log(`Verifying the ${candidates.length} most severe; ${overCap.length} left unverified and excluded: ${overCap.map((d) => `${d.file}:${d.line}`).join(', ')}`)
 
@@ -663,6 +832,17 @@ They were collapsed into one candidate because they name one line. Refute the
 whole of it or none: leave it standing where ANY of these claims survives, and
 say in reason which one you could not break.`
       : ''
+}${
+    f.instances.length > 0
+      ? `
+
+The same claim was reported about ${f.instances.length} other location(s):
+${f.instances.map((i) => `  - ${i.file}:${i.line} — ${i.summary}`).join('\n')}
+
+Your verdict decides all of them, so read more than the one above: refute it
+only where it fails at every location, and leave it standing where it holds at
+any. Say in reason which locations you checked.`
+      : ''
 }
 
 The change under review is ${diffSource}, across these files:
@@ -670,15 +850,15 @@ ${fileList}
 
 Read the code around it. ${
             VOTES > 1
-              ? `${lensAt(v).ask}\n\nThat is your lens and the whole of your job: you are verifier ${v + 1} of ${VOTES} and the others are reading it their own ways. Refute it on yours or leave it standing.`
-              : LENSES.map((l) => l.ask).join(' ')
+              ? `${lensAt(f.dimension, v).ask}\n\nThat is your lens and the whole of your job: you are verifier ${v + 1} of ${VOTES} and the others are reading it their own ways. Refute it on yours or leave it standing.`
+              : lensesFor(f.dimension).map((l) => l.ask).join(' ')
 }
 
 Default to refuted=true when you are uncertain, and set certain=false when that
 is why.`,
           {
             agentType: 'refute',
-            label: `refute:${f.file.split('/').pop()}:${f.line}${VOTES > 1 ? `/${lensAt(v).key}` : ''}`,
+            label: `refute:${f.file.split('/').pop()}:${f.line}${VOTES > 1 ? `/${lensAt(f.dimension, v).key}` : ''}`,
             phase: 'Refute',
             schema: VERDICT_SCHEMA,
           },
@@ -716,6 +896,7 @@ if (friction.length > 0) log(`${friction.length} note(s) about what got in the a
 return done({
   findings,
   checks,
+  checksNotMade,
   scope,
   attempted: attempted.length,
   reported: raw.length,

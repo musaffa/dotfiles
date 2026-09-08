@@ -20,15 +20,27 @@ need one, say so and stop.
 Which command answers "what changed" depends on what you were pointed at, and
 the wrong one under-reports without looking wrong:
 
-- **the working tree** — `git status --porcelain`, the only one that also sees
-  staged and untracked files. `git diff --name-only` sees neither, so where
-  work is sitting in the index it returns a fraction of the change
-- **a ref range** like `master..HEAD` — `git diff --name-only master..HEAD`.
-  `git status --porcelain` says nothing about it
+- **a ref range** like `master..HEAD` — `git diff --name-status -M master..HEAD`.
+  `git status` says nothing about it
+- **the uncommitted change** — whoever dispatched you usually hands you the
+  command for it. Where nobody did, it is
+  `GIT_INDEX_FILE=$(mktemp -u) sh -c 'git read-tree HEAD && git add -A && git
+  diff --cached -M --name-status HEAD; rm -f "$GIT_INDEX_FILE"'`
 
-`--porcelain` prefixes each path with two status columns. Strip them, and read
-them: `A` and `??` mean there is no committed version to compare against, and
-`D` means the file is gone.
+That last one is one read where the obvious ones are three and each of the
+three is short. `git diff` misses what is staged, `git diff --cached` misses
+what is not, and neither sees a file git is not tracking at all — so a change
+that moved a tree arrives as a pile of deletions and one collapsed `??` line,
+which is not a shape that reads as incomplete. Building a throwaway index in
+`/tmp` and diffing it against `HEAD` sees all three at once and pairs each
+moved file with where it came from. `GIT_INDEX_FILE` is what keeps it out of
+the repository: nothing is staged, written or reset, and the caller's own index
+is exactly as they left it. In a repository with no commit yet there is no
+`HEAD` to read against, so say that and list the tree instead.
+
+`--name-status` prefixes each path with its status letter. Read them: `A` means
+there is no committed version to compare against, `D` means the file is gone,
+and `R` is a rename, with the path it came from and the path it went to.
 
 A deleted file has no line to cite; a renamed one has two paths. Report a
 deletion as the path alone and a rename as both — never a line number in a

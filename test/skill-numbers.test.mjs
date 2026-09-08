@@ -33,11 +33,15 @@ const CAP = Number(capture(/const MAX_VERIFY_TOTAL = (\d+)/, 'MAX_VERIFY_TOTAL')
 const DEEP_VOTES = Number(capture(/DEPTH === 'deep' \? (\d+) : 1/, 'the deep vote count'))
 const DIMENSIONS = capture(/const PER_UNIT = \[([^\]]*)\]/, 'PER_UNIT').match(/key:/g).length
 const WHOLE = capture(/const WHOLE_CHANGE = \{ key: '([a-z]+)'/, 'WHOLE_CHANGE')
+// Dispatched over the whole change as well, but only where there is more than
+// one unit for a boundary to run between — so it is in every row of the cost
+// table below except the first two.
+const CROSS = capture(/const CROSS_UNIT = \{ key: '([a-z]+)'/, 'CROSS_UNIT')
 const FIXED = 2 // the scout and the checks agent, whatever the change is
 
 const enumAfter = (first) => capture(new RegExp(`enum: \\[('${first}'[^\\]]*)\\]`), `the enum starting '${first}'`).split(',').length
 
-const WORDS = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 20: 'twenty', 60: 'sixty' }
+const WORDS = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 20: 'twenty', 60: 'sixty' }
 const word = (n) => {
   assert.ok(WORDS[n], `no word form for ${n}, and the skill spells this one out — add it here and redraw the prose`)
   return WORDS[n]
@@ -53,14 +57,16 @@ test('the verification cap in prose is the cap in the script', () => {
 
 test('the review formula is the dimension count', () => {
   states(`\`${DIMENSIONS}n + 1\``)
+  states(`\`${DIMENSIONS}n + 2\``)
   states(`${word(DIMENSIONS)} dimensions per unit`)
   states(`**fixed** — ${word(FIXED)}, the scout and the checks agent`)
 })
 
 test('every cell of the cost table reconciles', () => {
-  // n units buy three dimensions each plus conventions once; a change with no
-  // code in it buys conventions alone.
-  const reviews = (n) => (n === 0 ? 1 : DIMENSIONS * n + 1)
+  // n units buy three dimensions each plus conventions once, plus boundaries
+  // once where there is more than one unit; a change with no code in it buys
+  // conventions alone.
+  const reviews = (n) => (n === 0 ? 1 : DIMENSIONS * n + (n > 1 ? 2 : 1))
   const rows = [
     ['none (no code changed)', 0],
     ['1, or a tree with no unit division', 1],
@@ -80,6 +86,7 @@ test('the dimension names in prose are the dimensions dispatched', () => {
     states(`\`${key}\``)
   }
   states(`\`${WHOLE}\``)
+  states(`\`${CROSS}\``)
 })
 
 test('the enum sizes in prose are the enum sizes in the schemas', () => {
