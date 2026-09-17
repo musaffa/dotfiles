@@ -85,6 +85,20 @@ A comment is for what is too small and too local for either — or for where
 restructuring would widen the change past what was asked, in which case write
 the short comment and propose the restructuring on its own.
 
+## Never count what the code holds
+
+"the eighteen names", "all twenty callers", "the five cases below" — a count is
+right the day it is written and wrong the first time one is added, and nothing
+about adding one leads the author back to the sentence that counted the old
+set. Name the set and let a reader who needs the number count.
+
+The same goes for a measurement the code already states — a width, a gutter, a
+breakpoint. The stylesheet below is where the number lives; a comment repeating
+it is a second copy that nothing updates.
+
+Write one only where the number *is* the rule — a limit, a fixed arity — so the
+code goes wrong at the same moment the comment does.
+
 ## A stale comment is a bug, and editing near one makes it yours
 
 When a change makes a nearby comment wrong, fixing it is part of that change.
