@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url'
 
 const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
 const SCRIPT = read('../workflows/review-change.js')
-const SKILL = read('../skills/fan-out/SKILL.md')
+const SKILL = read('../skills-staging/fan-out/SKILL.md')
 
 // The skill wraps at eighty columns, so a phrase it states is rarely on one
 // line. Everything below matches against the collapsed form.
