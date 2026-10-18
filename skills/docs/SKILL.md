@@ -15,6 +15,10 @@ commit message.
 **A rule a comment already states where the reader meets it is not a doc
 line.** Check the comments the change itself added first.
 
+**No number unless the line needs one.** A count, a size, a limit or a version
+changes, and nothing leads back to the doc that repeated it. Name where the
+code holds it instead.
+
 **A plan names a doc change by its line**, never as "a line on X", and the text
 is checked against this again when it is written. Approving a plan's code does
 not approve its doc line.
