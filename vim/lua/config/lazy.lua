@@ -59,7 +59,6 @@ require('lazy').setup {
         require('alpha').setup(require('alpha.themes.startify').config)
       end,
     },
-    { 'j-hui/fidget.nvim' },
 
     -- syntax
     {
@@ -72,7 +71,7 @@ require('lazy').setup {
           'OXY2DEV/markview.nvim',
           opts = {
             preview = {
-              filetypes = { 'markdown', 'codecompanion' },
+              filetypes = { 'markdown' },
               ignore_buftypes = {},
             },
           },
@@ -122,14 +121,6 @@ require('lazy').setup {
     { 'stevearc/conform.nvim' },
 
     -- assistant
-    {
-      'olimorris/codecompanion.nvim',
-      dependencies = {
-        'ravitemer/codecompanion-history.nvim',
-        'franco-ruggeri/codecompanion-spinner.nvim',
-      },
-    },
-    { 'zbirenbaum/copilot.lua' },
     {
       'ravitemer/mcphub.nvim',
       build = 'npm install -g mcp-hub@latest',
