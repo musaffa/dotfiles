@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Use when writing or reviewing a test, or deciding whether to write one at all — what to assert, which layer to assert it from, and what the test costs to run. Read it while making those choices, not after the test is green.
+description: Use when writing or reviewing a test, or deciding whether to write one at all — what to assert, which layer to assert it from, what the test costs to run, and what to call it. Read it while making those choices, not after the test is green.
 ---
 
 # Testing
@@ -71,3 +71,11 @@ sake — say what it costs and wait.
 Writing it unasked takes the caller's decision — the cost may well be worth
 paying, and they are the one who can say. Dropping the coverage silently is
 worse.
+
+## What a test is called
+
+### A name says the behaviour once
+
+A behaviour is one test, and its checks are assertions inside it, each
+reporting its own failure. The name leaves out what its groups already name
+and how those assertions check it.
