@@ -13,16 +13,13 @@ inheriting it.
 Inherit only where the parent is the whole of what the child is and the child
 adds nothing other code calls.
 
-## An extraction names one fact
+## An extraction stands for one fact
 
-What a reader has to open something else to learn, they no longer know where
-they are reading. A name standing for several unrelated facts — a helper
-bundling four validations, a shared example asserting five routes — takes what
-the call site stated plainly and puts it behind a lookup.
-
-Extract where the thing extracted has a name of its own in the domain, and
-leave the call site to state the rest. This holds for specs as much as for the
-code they cover.
+Every extraction moves something out of the reader's sight. That is worth it
+only when the call says enough that they need not look: extract one concept the
+domain already has, and leave the rest stated at the call site. Bundling
+unrelated steps, or extracting only because code repeats, hides what the call
+site said plainly. This holds for specs as much as for code.
 
 ## Fewer lines is not a reason
 
