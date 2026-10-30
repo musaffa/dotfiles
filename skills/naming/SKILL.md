@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Use when naming anything in code, in any language — a function or method, a variable or constant, a type, a module, package or file — when reviewing a name, or when changing what a named thing does. Read it while choosing the name, not in a pass afterwards.
+description: Use when naming anything in code, in any language — a function or method, a variable or constant, a type, a module, package or file — when reviewing a name, or when changing what something does or holds. Read it while choosing the name, not in a pass afterwards.
 ---
 
 # Naming
