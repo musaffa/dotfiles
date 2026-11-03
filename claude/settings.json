@@ -24,5 +24,8 @@
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
-  "preferredNotifChannel": "terminal_bell"
+  "preferredNotifChannel": "terminal_bell",
+  "env": {
+    "CLAUDE_CODE_EFFORT_LEVEL": "max"
+  }
 }
