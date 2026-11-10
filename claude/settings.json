@@ -12,7 +12,6 @@
       "~/.dotfiles/workflows"
     ]
   },
-  "model": "opus[1m]",
   "enableArtifact": false,
   "statusLine": {
     "type": "command",
