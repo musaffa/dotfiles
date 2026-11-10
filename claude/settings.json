@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EFFORT_LEVEL": "max"
+  },
   "attribution": {
     "commit": "",
     "pr": ""
@@ -18,14 +21,12 @@
   },
   "enabledPlugins": {
     "security-guidance@claude-plugins-official": true,
-    "sentry@claude-plugins-official": true
+    "sentry@claude-plugins-official": true,
+    "gitlab@claude-plugins-official": true
   },
   "outputStyle": "Concise",
   "syntaxHighlightingDisabled": false,
   "tui": "fullscreen",
   "skipWorkflowUsageWarning": true,
-  "preferredNotifChannel": "terminal_bell",
-  "env": {
-    "CLAUDE_CODE_EFFORT_LEVEL": "max"
-  }
+  "preferredNotifChannel": "terminal_bell"
 }
