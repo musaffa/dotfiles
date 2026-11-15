@@ -16,7 +16,7 @@ The usual way to write one by accident is to let the setup do the asserting — 
 factory that already puts the record in the state under test, a stub returning
 the value being checked, a fixture carrying the total the code should compute.
 
-### Assert the behaviour, not the way it is reached
+### Test the behaviour, not the way it is reached
 
 What was returned, what was written, what the caller can see afterwards. Not
 which method was called, in what order, with which arguments.
