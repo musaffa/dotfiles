@@ -32,7 +32,7 @@ version, fixed or improved, which the next change makes wrong.
 
 A name is wrong if, where it is used, it reads as something else, echoes a
 nearby word in another sense, or makes sense only inside the expression it was
-written for. Wordplay is never clarity.
+written for.
 
 A name carries as much as its reach requires. A local read beside its
 definition can be brief; a name used away from its definition says everything
