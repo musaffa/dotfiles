@@ -53,8 +53,8 @@ what the code is for.
 
 State the standing fact: not "changed to a savepoint so the batch below can
 fail", but why a savepoint is what this needs. No ticket references, no dates,
-no "now uses", no "previously" — the commit message and `docs/` hold what the
-change was about.
+no "now uses", no "previously" — the commit message holds what the change was
+about, and so does the plan it was built from, if it had one.
 
 ## Where it is genuinely hard, spend the lines — and work an example
 
@@ -78,8 +78,8 @@ the lines below.
 
 A block that needs explaining often needs a name: extract it, or rename the
 variable, and the explanation travels to every call site instead. A reason big
-enough to want a paragraph usually belongs in `docs/` or the commit message,
-where it is read before the code rather than found inside it.
+enough to want a paragraph usually belongs in the commit message, or the plan
+the change was built from, rather than in front of everyone who reads the file.
 
 A comment is for what is too small and too local for either — or for where
 restructuring would widen the change past what was asked, in which case write
