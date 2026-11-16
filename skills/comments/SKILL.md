@@ -36,6 +36,19 @@ file is being obeyed. Write it to someone fluent in the language who has never
 seen this codebase — they do not need a `for` loop explained, they need to know
 what the loop is protecting against.
 
+Worth its keep:
+
+```ruby
+# A savepoint rather than a plain transaction: the batch below is allowed to
+# fail without taking the correction above it down.
+```
+
+Not:
+
+```ruby
+# Wrap in a savepoint and then process each line, updating the status.
+```
+
 ## Plain English, not a second implementation
 
 Say it the way you would to a colleague away from the keyboard. A comment in
@@ -120,18 +133,3 @@ One somebody else left is a question rather than a deletion: it is disabled for
 a reason the block itself does not carry. **Ask**, saying what it would do if it
 ran and whether it still works. Deleting it, fixing it, and leaving it alone are
 three different jobs, and which one is wanted is the caller's to choose.
-
-## Two examples
-
-Worth its keep:
-
-```ruby
-# A savepoint rather than a plain transaction: the batch below is allowed to
-# fail without taking the correction above it down.
-```
-
-Not:
-
-```ruby
-# Wrap in a savepoint and then process each line, updating the status.
-```
