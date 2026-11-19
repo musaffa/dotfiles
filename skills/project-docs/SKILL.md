@@ -1,9 +1,9 @@
 ---
-name: docs
+name: project-docs
 description: Use when adding to or changing a project's docs — docs/ or the README — or when a plan lists a doc change. The default is no new line. Read it while writing the line, not when planning.
 ---
 
-# Docs
+# Project docs
 
 **Correct the lines a change made wrong.** Behaviour no line describes is not
 a reason to write one: the code, its comments and the commit message carry it.

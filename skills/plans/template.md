@@ -41,8 +41,8 @@ too.
 - **One phase at a time, in order**, unless the lines under the Status table
   say otherwise.
 - **Load the skill a step touches before writing it**: `design-principles`
-  for a refactor, `testing` for a test, `comments` for a comment, `docs` for
-  a doc line, `naming` for a name, and {the project's scaffolding skill} for
+  for a refactor, `testing` for a test, `comments` for a comment, `project-docs`
+  for a doc line, `naming` for a name, and {the project's scaffolding skill} for
   a generator or schema change.
 - **A pattern change changes `_templates/` in the same phase**, and a move
   takes its tests along.
