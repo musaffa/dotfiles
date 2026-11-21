@@ -19,6 +19,11 @@ line.** Check the comments the change itself added first.
 changes, and nothing leads back to the doc that repeated it. Name where the
 code holds it instead.
 
+**A tooling doc stays generic.** A shared section states the mechanism for
+all of the codebase, a placeholder where a name goes, never one feature's
+names, files or remedies; a feature's own paragraph names the feature and
+points there.
+
 **A plan names a doc change by its line**, never as "a line on X", and the text
 is checked against this again when it is written. Approving a plan's code does
 not approve its doc line.
