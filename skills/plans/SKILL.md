@@ -32,3 +32,7 @@ showed, so its number still points at it.
 
 **A plan that says a built phase is committed is the caller asking for it**:
 commit the phase when it is finished, unless they hold it.
+
+**Before building the first phase, ask once**: whether to commit each phase
+as it is finished, whether to compact after each, and whether to go on to the
+next phase alone or wait.
