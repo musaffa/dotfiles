@@ -40,6 +40,12 @@ too.
 
 - **One phase at a time, in order**, unless the lines under the Status table
   say otherwise.
+
+<!-- Added once asked, before the first phase is built. -->
+
+- **Once a phase is built**, it is {committed | left for the caller}, {the
+  session stops for `/compact` | no compact follows}, and {the caller is asked
+  before the next | the next is begun alone} ({YYYY-MM-DD}).
 - **Load the skill a step touches before writing it**: `design-principles`
   for a refactor, `testing` for a test, `comments` for a comment, `project-docs`
   for a doc line, `naming` for a name, and {the project's scaffolding skill} for

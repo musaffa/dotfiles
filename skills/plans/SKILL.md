@@ -35,4 +35,4 @@ commit the phase when it is finished, unless they hold it.
 
 **Before building the first phase, ask once**: whether to commit each phase
 as it is finished, whether to compact after each, and whether to go on to the
-next phase alone or wait.
+next phase alone or wait. The answers go in How to work through it.
